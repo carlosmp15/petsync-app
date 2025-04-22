@@ -1,5 +1,5 @@
 import { useNavigate } from "react-router-dom"
-import { useEffect, useState } from "react"
+import { useEffect } from "react"
 import { Label } from "@/components/ui/label"
 import { Input } from "@/components/ui/input"
 import { Button } from "@/components/ui/button"
@@ -9,14 +9,18 @@ import { toast, ToastContainer } from "react-toastify"
 import { PhoneInput } from "@/components/PhoneInput"
 import { createNewUser } from "@/services/UserService"
 import { DatePicker } from "@/components/ui/date-picker"
+import { useUserStore } from "@/stores/userStore"
 
 export default function RegisterPage() {
-  const [name, setName] = useState<string>("")
-  const [surname, setSurname] = useState<string>("")
-  const [email, setEmail] = useState<string>("")
-  const [phone, setPhone] = useState<string>("")
-  const [password, setPassword] = useState<string>("")
-  const [birthday, setBirthday] = useState<Date>()
+  const {
+    name, setName,
+    surname, setSurname,
+    email, setEmail,
+    phone, setPhone,
+    password, setPassword,
+    birthday, setBirthday,
+  } = useUserStore()
+  
 
   const navigate = useNavigate()
 
@@ -39,6 +43,9 @@ export default function RegisterPage() {
 
     try {
       if (result?.success) {
+        const { resetUser } = useUserStore.getState();
+        resetUser(); // Reseteamos el estado global
+
         const debouncedNavigate = debounce(() => {
           navigate("/account/login")
         }, 2200)
@@ -120,32 +127,6 @@ export default function RegisterPage() {
                 </div>
                 <div className="grid gap-2">
                   <Label htmlFor="birthday">Fecha de nacimiento</Label>
-                  {/* <Popover>
-                    <PopoverTrigger asChild>
-                      <Button
-                        variant={"outline"}
-                        className={cn(
-                          "w-[240px] justify-start text-left font-normal",
-                          !birthday && "text-muted-foreground"
-                        )}
-                      >
-                        <CalendarIcon />
-                        {birthday ? (
-                          format(birthday, "PPP", { locale: es })
-                        ) : (
-                          <span>Selecciona una fecha</span>
-                        )}
-                      </Button>
-                    </PopoverTrigger>
-                    <PopoverContent className="w-auto p-0" align="start">
-                      <Calendar
-                        mode="single"
-                        selected={birthday}
-                        onSelect={setBirthday}
-                        initialFocus
-                      />
-                    </PopoverContent>
-                  </Popover> */}
                   <DatePicker selected={birthday} onSelect={setBirthday} />
                 </div>
                 <Button type="submit" className="w-full">

@@ -7,6 +7,10 @@ import ForgotPasswordPage from "./pages/ForgotPasswordPage"
 import ChangePasswordPage from "./pages/ChangePassswordPage"
 import SidebarLayout from "./layouts/SidebarLayout"
 import SettingsPage from "./pages/SettingsPage"
+import ManageFeedingsPage from "./pages/ManageFeedingsPage"
+import ManageDailyActivities from "./pages/ManageDailyActivities"
+import ManageMedicalHistoriesPage from "./pages/ManageMedicalHistoriesPage"
+
 
 export default function AppRouter() {
   return (
@@ -32,6 +36,9 @@ export default function AppRouter() {
         >
           <Route path="/" element={<HomePage />} />
           <Route path="/account/settings" element={<SettingsPage />} />
+          <Route path="/pet/feedings" element={<ManageFeedingsPage />} />
+          <Route path="/pet/daily-activities" element={<ManageDailyActivities />} />
+          <Route path="/pet/medical-histories" element={<ManageMedicalHistoriesPage />} />
         </Route>
 
       </Routes>

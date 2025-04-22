@@ -27,7 +27,7 @@ const data = {
   user: {
     name: "Carlos",
     email: "carlos@example.com",
-    avatar: "/avatars/shadcn.jpg",
+    avatar: "https://github.com/shadcn.png",
   },
   teams: [
     {
@@ -47,7 +47,7 @@ const data = {
       items: [
         {
           title: "Gestionar alimentación",
-          url: "#",
+          url: "/pet/feedings",
         },
       ],
     },
@@ -58,7 +58,7 @@ const data = {
       items: [
         {
           title: "Gestionar act. diarias",
-          url: "#",
+          url: "/pet/daily-activities",
         },
       ],
     },
@@ -69,7 +69,7 @@ const data = {
       items: [
         {
           title: "Gestionar hist. médicos",
-          url: "#",
+          url: "/pet/medical-histories",
         },
       ],
     },
@@ -101,7 +101,6 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
       </SidebarHeader>
       <SidebarContent>
         <NavMain items={data.navMain} />
-        {/* <NavProjects projects={data.projects} /> */}
       </SidebarContent>
       <SidebarFooter>
         <NavUser user={data.user} />

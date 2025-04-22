@@ -38,4 +38,24 @@ export async function createNewUser(name: string, surname: string, email: string
   }
 }
 
+// Actualiza los datos personales de un usuario
+export async function updateUserData(name: string, surname: string, email: string, phone: string, password: string, birthday: Date) {
+  try {
+    const url = `${import.meta.env.VITE_API_URL}/user`
+    const response = await axios.post(url, {
+      name, surname, email, phone, password, birthday: format(birthday, "yyyy-MM-dd")
+    })
+
+    if (response.status === OK_CODE) {
+      return { success: true, message: "Datos personales actualizados correctamente." }
+    } else {
+      return { success: false, message: "No se han podido actualizar los datos personales. \nInténtelo de nuevo más tarde." }
+    }    
+  } catch (error) {
+    return { success: false, message: "Ha ocurrido un error de conexión." }
+  }
+}
+
+
+
 

@@ -27,6 +27,7 @@ import {
   useSidebar,
 } from "@/components/ui/sidebar"
 import { useNavigate } from "react-router-dom"
+import { NavLink } from "react-router-dom"
 
 export function NavUser({
   user,
@@ -88,8 +89,13 @@ export function NavUser({
               <DropdownMenuItem
                 className="cursor-pointer"
               >
-                <Settings />
-                Ajustes
+                <NavLink 
+                  to="/account/settings"
+                  className="flex flex-row items-center gap-2"
+                >
+                  <Settings />
+                  Ajustes
+                </NavLink>
               </DropdownMenuItem>
             </DropdownMenuGroup>
             <DropdownMenuSeparator />
