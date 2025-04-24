@@ -6,13 +6,13 @@ import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
 import { Calendar } from "@/components/ui/calendar"
 import { es } from "date-fns/locale"
-import { useUserStore } from "@/stores/userStore" // Asegúrate de tener la ruta correcta de tu store
+import { useUserStore } from "@/stores/userStore"
 
 interface DatePickerProps {
   startYear?: number
   endYear?: number
-  selected?: Date // Si se pasa, se usará como fecha seleccionada
-  onSelect?: (value: Date) => void // Cambiado a tipo adecuado
+  selected?: Date
+  onSelect?: (value: Date) => void
 }
 
 export function DatePicker({
@@ -21,9 +21,9 @@ export function DatePicker({
   selected,
   onSelect,
 }: DatePickerProps) {
-  const { birthday, setBirthday } = useUserStore() // Si no usas zustand, esto se puede eliminar
+  const { birthday, setBirthday } = useUserStore() 
 
-  const [date, setDate] = useState<Date>(selected || birthday || new Date()) // Inicia con selected, o birthday si está disponible, o la fecha actual
+  const [date, setDate] = useState<Date>(selected || birthday || new Date()) 
 
   const months = [
     "January", "February", "March", "April", "May", "June", "July",
@@ -32,32 +32,28 @@ export function DatePicker({
 
   const years = Array.from({ length: endYear - startYear + 1 }, (_, i) => startYear + i)
 
-  // Actualizar la fecha del mes seleccionado
   const handleMonthChange = (month: string) => {
     const newDate = setMonth(date, months.indexOf(month));
     setDate(newDate)
-    if (onSelect) onSelect(newDate) // Usamos onSelect si está disponible
-    else setBirthday(newDate) // Si no hay onSelect, actualizamos el estado global
+    if (onSelect) onSelect(newDate) 
+    else setBirthday(newDate)
   }
 
-  // Actualizar la fecha del año seleccionado
   const handleYearChange = (year: string) => {
     const newDate = setYear(date, parseInt(year));
     setDate(newDate)
-    if (onSelect) onSelect(newDate) // Usamos onSelect si está disponible
-    else setBirthday(newDate) // Si no hay onSelect, actualizamos el estado global
+    if (onSelect) onSelect(newDate)
+    else setBirthday(newDate)
   }
 
-  // Seleccionar una nueva fecha
   const handleSelect = (selectedData: Date | undefined) => {
     if (selectedData) {
       setDate(selectedData)
-      if (onSelect) onSelect(selectedData) // Usamos onSelect si está disponible
-      else setBirthday(selectedData) // Si no hay onSelect, actualizamos el estado global
+      if (onSelect) onSelect(selectedData)
+      else setBirthday(selectedData)
     }
   }
 
-  // Si `birthday` de zustand está vacío, lo inicializamos con `selected` o la fecha actual
   useEffect(() => {
     if (!birthday && !selected) {
       setBirthday(new Date())
@@ -107,11 +103,11 @@ export function DatePicker({
 
         <Calendar
           mode="single"
-          selected={date} // Se usa la fecha actual o la que viene por la prop selected
-          onSelect={handleSelect} // Actualiza la fecha al seleccionar un día
+          selected={date}
+          onSelect={handleSelect} 
           initialFocus
           month={date}
-          onMonthChange={setDate} // Se usa para cambiar el mes
+          onMonthChange={setDate}
         />
       </PopoverContent>
     </Popover>

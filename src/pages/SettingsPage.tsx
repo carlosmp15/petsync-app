@@ -1,3 +1,4 @@
+import React, { useEffect, useState } from "react"
 import { Button } from "@/components/ui/button"
 import { Label } from "@/components/ui/label"
 import { Input } from "@/components/ui/input"
@@ -6,49 +7,82 @@ import { Avatar, AvatarImage, AvatarFallback } from "@/components/ui/avatar"
 import { PhoneInput } from "@/components/PhoneInput"
 import { DatePicker } from "@/components/ui/date-picker"
 import { updateUserData } from "@/services/UserService"
-import { useState } from "react"
-import { useNavigate } from "react-router-dom"
-import debounce from "just-debounce-it"
 import { toast, ToastContainer } from "react-toastify"
 import { useUserStore } from "@/stores/userStore"
+import { getUserDataFromLocalStorage } from "@/utils"
 
 export default function SettingsPage() {
-  const {
-      name, setName,
-      surname, setSurname,
-      email, setEmail,
-      phone, setPhone,
-      password, setPassword,
-      birthday, setBirthday,
-    } = useUserStore()
+  const [password, setPassword] = useState("")
+  const [confirmPasswd, setConfirmPasswd] = useState("")
 
-  const navigate = useNavigate()
+  const {
+    id, 
+    name, setName,
+    surname, setSurname,
+    email, setEmail,
+    phone, setPhone,
+    birthday, setBirthday, 
+    setUser
+  } = useUserStore()
+  
+  const userData = getUserDataFromLocalStorage()
+
+  const [isUserLoaded, setIsUserLoaded] = useState(false) // estado de carga
+
+  const [error, setError] = useState("")
+
+  const validatePasswords = () => {
+    if (password && confirmPasswd && password !== confirmPasswd) {
+      setError("Las contraseñas no coinciden")
+    } else {
+      setError("")
+    }
+  }  
+
+  useEffect(() => {
+    const user = localStorage.getItem("user")
+    if (user) {
+      const parsedUser = JSON.parse(user)
+      setUser(parsedUser)
+    }
+    setIsUserLoaded(true)
+  }, [setUser])
+
+  if (!isUserLoaded) return <div>Cargando datos del usuario...</div>
 
   const handleUpdate = async (event: React.FormEvent) => {
     event.preventDefault()
 
-    const result = await updateUserData(
-      name,
-      surname,
-      email,
-      phone,
-      password,
-      birthday as Date
-    )
+    if (error && (password || confirmPasswd)) {
+      toast.warning("Las contraseñas no coinciden o están incompletas", {
+        autoClose: 2000
+      })
+      return
+    }
 
-    try {
-      if (result?.success) {
-        const debouncedNavigate = debounce(() => {
-          navigate("/account/login")
-        }, 2200)
-
-        toast.success(result.message, {
-          autoClose: 2000,
-        })
-        debouncedNavigate()
+    if(birthday) {
+      try {
+        const result = await updateUserData(id, name, surname, email, phone, password, new Date(birthday))
+  
+        if (result?.success && result.user) {
+          setUser({
+            name: result.user.name,
+            surname: result.user.surname,
+            email: result.user.email,
+            phone: result.user.phone,
+            birthday: result.user.birthday,
+            id: result.user.id
+          })
+          toast.success(result.message, {
+            autoClose: 2000,
+          })
+        } else {
+          toast.error(result?.message || "Error al actualizar el usuario")
+        }
+      } catch (error) {
+        toast.error("Error inesperado al actualizar")
+        console.error("Error en handleUpdate:", error)
       }
-    } catch (error) {
-      toast.error(result?.message)
     }
   }
 
@@ -65,7 +99,7 @@ export default function SettingsPage() {
             </Avatar>
 
             <div className="space-y-1">
-              <h1 className="text-2xl font-bold">Luis Pérez Gómez</h1>
+              <h1 className="text-2xl font-bold">{userData?.name + " " + userData?.surname}</h1>
               <Button size="sm">Cambiar foto</Button>
             </div>
           </div>
@@ -79,7 +113,8 @@ export default function SettingsPage() {
                   id="name"
                   name="name"
                   placeholder="E.j Luis"
-                  defaultValue="Luis"
+                  defaultValue={userData?.name}
+                  onChange={(e) => setName(e.target.value)}
                 />
               </div>
               <div className="space-y-2">
@@ -88,16 +123,18 @@ export default function SettingsPage() {
                   id="surname"
                   name="surname"
                   placeholder="E.j Pérez Gómez"
-                  defaultValue="Pérez Gómez"
+                  defaultValue={userData?.surname}
+                  onChange={(e) => setSurname(e.target.value)}
                 />
               </div>
               <div className="space-y-2">
                 <Label htmlFor="email">Email</Label>
-                <Input 
-                  id="email" 
-                  name="email" 
-                  placeholder="E.j email@example.com" 
-                  defaultValue="email@example.com" 
+                <Input
+                  id="email"
+                  name="email"
+                  placeholder="E.j email@example.com"
+                  defaultValue={userData?.email} 
+                  onChange={(e) => setEmail(e.target.value)}
                 />
               </div>
               <div className="space-y-2">
@@ -106,12 +143,13 @@ export default function SettingsPage() {
                   id="phone-number"
                   name="phone-number"
                   placeholder="E.j +34 654 34 23 12"
-                  value="+34654342312"
+                  value={userData?.phone}
+                  onChange={setPhone}
                 />
               </div>
               <div className="space-y-2 flex flex-col">
                 <Label htmlFor="birthday">Fecha de nacimiento</Label>
-                <DatePicker />
+                <DatePicker selected={userData?.birthday} onSelect={setBirthday}/>
               </div>
             </CardContent>
           </Card>
@@ -121,17 +159,34 @@ export default function SettingsPage() {
                 <h1 className="text-xl font-semibold">Actualizar contraseña</h1>
               </div>
               <div>
-              Por su seguridad, por favor no comparta su contraseña con otras personas.
+                Por su seguridad, por favor no comparta su contraseña con otras personas.
               </div>
             </CardHeader>
             <CardContent className="space-y-4">
               <div className="space-y-2">
                 <Label htmlFor="new-password">Nueva Contraseña</Label>
-                <Input type="password" id="new-password" />
+                <Input 
+                  type="password" 
+                  id="new-password" 
+                  name="new-password" 
+                  value={password}
+                  onChange={(e) => {
+                    setPassword(e.target.value)
+                    validatePasswords()
+                  }}
+                />
+                {error && <p className="text-sm text-red-700">{error}</p>}
               </div>
               <div className="space-y-2">
                 <Label htmlFor="confirm-password">Confirmar Contraseña</Label>
-                <Input type="password" id="confirm-password" />
+                <Input 
+                  type="password" 
+                  id="confirm-password" 
+                  name="confirm-password" 
+                  value={confirmPasswd}
+                  onChange={(e) => setConfirmPasswd(e.target.value)}
+                />
+                {error && <p className="text-sm text-red-700">{error}</p>}
               </div>
             </CardContent>
           </Card>

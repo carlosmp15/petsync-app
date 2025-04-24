@@ -7,6 +7,7 @@ interface UserState {
   phone: string
   password: string
   birthday: Date | undefined
+  id: number | undefined
 
   setName: (value: string) => void
   setSurname: (value: string) => void
@@ -14,7 +15,9 @@ interface UserState {
   setPhone: (value: string) => void
   setPassword: (value: string) => void
   setBirthday: (value: Date) => void
+  setId: (value: number) => void
 
+  setUser: (user: { name: string, surname: string, email: string, phone: string, birthday: string, id: number }) => void
   resetUser: () => void
 }
 
@@ -25,6 +28,7 @@ export const useUserStore = create<UserState>((set) => ({
   phone: "",
   password: "",
   birthday: undefined,
+  id: undefined,
 
   setName: (value) => set({ name: value }),
   setSurname: (value) => set({ surname: value }),
@@ -32,6 +36,16 @@ export const useUserStore = create<UserState>((set) => ({
   setPhone: (value) => set({ phone: value }),
   setPassword: (value) => set({ password: value }),
   setBirthday: (value) => set({ birthday: value }),
+  setId: (value) => set({ id: value }),
+
+  setUser: (user) => set({
+    name: user.name,
+    surname: user.surname,
+    email: user.email,
+    phone: user.phone,
+    birthday: new Date(user.birthday),
+    id: user.id,
+  }),
 
   resetUser: () =>
     set({
@@ -41,5 +55,6 @@ export const useUserStore = create<UserState>((set) => ({
       phone: "",
       password: "",
       birthday: undefined,
+      id: undefined,
     }),
 }))

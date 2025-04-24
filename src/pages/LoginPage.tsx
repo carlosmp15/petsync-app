@@ -7,6 +7,7 @@ import { useNavigate } from "react-router-dom"
 import { ToastContainer, toast } from "react-toastify"
 import { NavLink } from "react-router-dom"
 import debounce from "just-debounce-it"
+import { useUserStore } from "@/stores/userStore"
 
 export default function LoginPage() {
     const navigate = useNavigate()
@@ -27,6 +28,19 @@ export default function LoginPage() {
     const result = await authUsers(email, password)
     try {
       if (result.success) {
+        // Guardamos el usuario en store con zustand 
+        const { name, surname, email, phone, birthday, id } = result.data.results;
+        const setUser = useUserStore.getState().setUser;
+
+        setUser({
+          name,
+          surname,
+          email,
+          phone,
+          birthday,
+          id,
+        });
+
         // Usuario autenticado exitosamente
         const debouncedNavigate = debounce(() => {
             navigate("/")

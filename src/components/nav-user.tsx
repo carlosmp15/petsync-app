@@ -28,6 +28,7 @@ import {
 } from "@/components/ui/sidebar"
 import { useNavigate } from "react-router-dom"
 import { NavLink } from "react-router-dom"
+import { useUserStore } from "@/stores/userStore"
 
 export function NavUser({
   user,
@@ -39,12 +40,14 @@ export function NavUser({
   }
 }) {
   const { isMobile } = useSidebar()
-  const navigate = useNavigate();
+  const { resetUser } = useUserStore()
+  const navigate = useNavigate()
 
   const handleLogout = () => {
-    localStorage.removeItem("user");
-    navigate("/account/login"); 
-  };
+    localStorage.removeItem("user")
+    resetUser()
+    navigate("/account/login")
+  }
 
   return (
     <SidebarMenu>
