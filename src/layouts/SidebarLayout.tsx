@@ -7,11 +7,33 @@ import {
   SidebarTrigger,
 } from "@/components/ui/sidebar"
 import { Outlet } from "react-router-dom"
+import { getAllPetsByUserId } from "@/services/PetService"
+import { getUserDataFromLocalStorage } from "@/utils"
+import { useEffect, useState } from "react"
+import { PetsName } from "@/types"
 
 export default function SidebarLayout() {
+  const [userPets, setUserPets] = useState<PetsName>([])
+  const userData = getUserDataFromLocalStorage()
+
+  const fetchPets = async () => {
+    const result = await getAllPetsByUserId(userData?.id)
+
+    try {
+      if (result?.success) {
+        // localStorage.setItem('userPets', JSON.stringify(result.data))
+        setUserPets(result.data) 
+      }
+    } catch (error) {
+      console.log(error)
+    }
+  }
+
+  useEffect(() => {fetchPets()}, [])
+
   return (
     <SidebarProvider>
-      <AppSidebar />
+      <AppSidebar userPets={userPets} />
       <SidebarInset>
         <header className="flex h-16 shrink-0 items-center gap-2 transition-[width,height] ease-linear group-has-[[data-collapsible=icon]]/sidebar-wrapper:h-12">
           <div className="flex items-center gap-2 px-4">

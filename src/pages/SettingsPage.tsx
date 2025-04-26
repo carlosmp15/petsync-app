@@ -10,6 +10,7 @@ import { updateUserData } from "@/services/UserService"
 import { toast, ToastContainer } from "react-toastify"
 import { useUserStore } from "@/stores/userStore"
 import { getUserDataFromLocalStorage } from "@/utils"
+import { format } from 'date-fns'
 
 export default function SettingsPage() {
   const [password, setPassword] = useState("")
@@ -62,17 +63,22 @@ export default function SettingsPage() {
 
     if(birthday) {
       try {
-        const result = await updateUserData(id, name, surname, email, phone, password, new Date(birthday))
-  
-        if (result?.success && result.user) {
-          setUser({
-            name: result.user.name,
-            surname: result.user.surname,
-            email: result.user.email,
-            phone: result.user.phone,
-            birthday: result.user.birthday,
-            id: result.user.id
-          })
+        const result = await updateUserData(id, name, surname, email, phone, password, format(birthday, 'yyyy-MM-dd'))
+        
+        if (result?.success && result.user.data) {
+          const updatedUser = {
+            name: result.user.data.name,
+            surname: result.user.data.surname,
+            email: result.user.data.email,
+            phone: result.user.data.phone,
+            birthday: result.user.data.birthday,
+            id: result.user.data.id
+          };
+        
+          localStorage.removeItem("user");
+          localStorage.setItem("user", JSON.stringify(updatedUser));
+          setUser(updatedUser);
+
           toast.success(result.message, {
             autoClose: 2000,
           })

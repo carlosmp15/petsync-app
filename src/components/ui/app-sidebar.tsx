@@ -1,6 +1,5 @@
 "use client";
 
-import * as React from "react";
 import {
   Frame,
   Map,
@@ -21,29 +20,22 @@ import {
   SidebarHeader,
   SidebarRail,
 } from "@/components/ui/sidebar"
-import { useUserStore } from "@/stores/userStore"
-import { getUserDataFromLocalStorage } from "@/utils";
+import { getUserDataFromLocalStorage } from "@/utils"
 
-export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
+export function AppSidebar({ userPets = [], ...props }: { userPets: any[], [key: string]: any }) {
   const userData = getUserDataFromLocalStorage()
 
-  // This is sample data.
   const data = {
     user: {
       name: userData?.name,
       email: userData?.email,
       avatar: "https://github.com/shadcn.png",
     },
-    teams: [
-      {
-        name: "Toby",
-        logo: PawPrint,
-      },
-      {
-        name: "Kira",
-        logo: PawPrint,
-      },
-    ],
+    teams: userPets?.map((pet: { id: number; name: string }) => ({
+      id: pet.id,
+      name: pet.name,
+      logo: PawPrint,
+    })) ?? [],
     navMain: [
       {
         title: "Alimentación",

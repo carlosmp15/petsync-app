@@ -39,11 +39,11 @@ export async function createNewUser(name: string, surname: string, email: string
 }
 
 // Actualiza los datos personales de un usuario
-export async function updateUserData(id: number | undefined, name: string, surname: string, email: string, phone: string, password: string, birthday: Date) {
+export async function updateUserData(id: number | undefined, name: string, surname: string, email: string, phone: string, password: string, birthday: string) {
   try {
     const url = `${import.meta.env.VITE_API_URL}/user/${id}`
     const response = await axios.put(url, {
-      name, surname, email, phone, password, birthday: format(birthday, "yyyy-MM-dd")
+      name, surname, email, phone, password, birthday
     })
 
     if (response.status === OK_CODE) {
