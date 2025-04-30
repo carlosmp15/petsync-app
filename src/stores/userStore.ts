@@ -1,6 +1,6 @@
 import { create } from "zustand"
 
-interface UserState {
+type UserState = {
   name: string
   surname: string
   email: string

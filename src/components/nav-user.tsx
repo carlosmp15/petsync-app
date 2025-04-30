@@ -29,6 +29,7 @@ import {
 import { useNavigate } from "react-router-dom"
 import { NavLink } from "react-router-dom"
 import { useUserStore } from "@/stores/userStore"
+import { handleLogout } from "@/utils"
 
 export function NavUser({
   user,
@@ -42,13 +43,6 @@ export function NavUser({
   const { isMobile } = useSidebar()
   const { resetUser } = useUserStore()
   const navigate = useNavigate()
-
-  const handleLogout = () => {
-    localStorage.removeItem("user")
-    localStorage.removeItem("selectedPet")
-    resetUser()
-    navigate("/account/login")
-  }
 
   return (
     <SidebarMenu>
@@ -90,22 +84,20 @@ export function NavUser({
             </DropdownMenuLabel>
             <DropdownMenuSeparator />
             <DropdownMenuGroup>
+            <NavLink to="/account/settings"
+            >
               <DropdownMenuItem
                 className="cursor-pointer"
               >
-                <NavLink 
-                  to="/account/settings"
-                  className="flex flex-row items-center gap-2"
-                >
                   <Settings />
                   Ajustes
-                </NavLink>
               </DropdownMenuItem>
+            </NavLink>
             </DropdownMenuGroup>
             <DropdownMenuSeparator />
             <DropdownMenuItem 
               className="cursor-pointer"
-              onClick={handleLogout}
+              onClick={() => handleLogout(navigate, resetUser)}
             >
               <LogOut />
               Cerrar sesión

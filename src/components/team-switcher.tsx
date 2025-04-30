@@ -1,6 +1,6 @@
 "use client"
 
-import { ChevronsUpDown, PawPrint, Plus } from "lucide-react"
+import { ChevronsUpDown, PawPrint, Plus, RotateCw } from "lucide-react"
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -23,15 +23,12 @@ import {
   DialogFooter,
   DialogHeader,
   DialogTitle,
-  DialogTrigger,
 } from "@/components/ui/dialog"
 
 import {
   Select,
   SelectContent,
-  SelectGroup,
   SelectItem,
-  SelectLabel,
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select"
@@ -39,6 +36,13 @@ import {
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
+import { createNewPet, getFilteredBreeds, getPetImage } from "@/services/PetService"
+import { usePetStore } from "@/stores/petStore"
+import { toast, ToastContainer } from "react-toastify"
+import { format } from "date-fns"
+import { DatePicker } from "./ui/date-picker"
+import { getUserDataFromLocalStorage } from "@/utils"
+import { useNavigate } from "react-router-dom"
 
 
 export function TeamSwitcher({
@@ -52,8 +56,48 @@ export function TeamSwitcher({
 }) {
   const { isMobile } = useSidebar()
   const [activeTeam, setActiveTeam] = useState(teams.length > 0 ? teams[0] : null)
-  const [openDialog, setOpenDialog] = useState(false);
+  const [openDialog, setOpenDialog] = useState(false)
+  const [breedSuggestions, setBreedSuggestions] = useState<string[]>([])
+  const userData = getUserDataFromLocalStorage()
+  const navigate = useNavigate()
+  const {
+    name, setName,
+    breed, setBreed,
+    gender, setGender,
+    weight, setWeight,
+    birthday, setBirthday,
+    photo, setPhoto,
+    resetPet
+  } = usePetStore()
 
+  const handleSubmit = async (event: React.FormEvent) => {
+    event.preventDefault()
+
+    if (!name || !breed || !gender || !weight || !birthday) {
+      toast.error("Todos los campos son obligatorios.")
+      return
+    }
+
+    try {
+      const result = await createNewPet(userData?.id, name, breed, gender, weight, format(birthday, 'yyyy-MM-dd'), photo)
+
+      if (result?.success) {
+        resetPet()
+      
+        toast.success(result.message, {
+          autoClose: 2000,
+        })
+      
+        setTimeout(() => {
+          navigate(0)
+        }, 2300)
+      } else {
+        toast.error(result?.message)
+      }
+    } catch (error) {
+      console.error("Error en handleUpdate:", error)
+    }
+  }
 
   useEffect(() => {
     const storedPet = localStorage.getItem('selectedPet')
@@ -74,9 +118,35 @@ export function TeamSwitcher({
       }
     }
   }, [teams])
-  
+
+const handleChangePhoto = async (selectedBreed: string) => {
+  const url = await getPetImage(selectedBreed)
+  if(url.success) {
+    if(url.message !== "") {
+      setPhoto(url.message)
+    }
+  }
+}
+
+const handleBreedInputChange = async (e: React.ChangeEvent<HTMLInputElement>) => {
+  const input = e.target.value;
+  setBreed(input);
+
+  if (input.length >= 2) {
+    const filtered = await getFilteredBreeds(input);
+    setBreedSuggestions(filtered.slice(0, 6)) // 6 primeros resultados
+  } else {
+    setBreedSuggestions([])
+  }
+  if (input && breedSuggestions.includes(input)) {
+    handleChangePhoto(input)
+  }
+}
+
+
   return (
     <SidebarMenu>
+      <ToastContainer />
       <SidebarMenuItem>
         <DropdownMenu>
           <DropdownMenuTrigger asChild>
@@ -158,18 +228,47 @@ export function TeamSwitcher({
                 <div className="grid gap-4 py-4">
                   <div className="flex flex-col gap-1">
                     <Label htmlFor="name">Nombre</Label>
-                    <Input id="name" placeholder="Nombre de la mascota" />
+                    <Input 
+                      id="name" 
+                      placeholder="Nombre de la mascota" 
+                      required
+                      value={name}
+                      onChange={(e) => setName(e.target.value)}
+                    />
+                  
                   </div>
 
-                  {/* Raza */}
                   <div className="flex flex-col gap-1">
                     <Label htmlFor="breed">Raza</Label>
-                    <Input id="breed" placeholder="Raza de la mascota (ej: Labrador)" />
+                    <Input
+                      id="breed"
+                      placeholder="Raza de la mascota (ej: Labrador)"
+                      required
+                      value={breed}
+                      onChange={handleBreedInputChange}
+                      list="breed-suggestions"
+                    />
+                    <datalist id="breed-suggestions">
+                      {breedSuggestions.length > 0 &&
+                        breedSuggestions.map((suggestion) => (
+                          <option 
+                            key={suggestion}
+                            value={suggestion}
+                          >
+                            {suggestion}
+                          </option>
+                        ))}
+                    </datalist>
                   </div>
 
                   <div className="flex flex-col gap-1">
                     <Label htmlFor="gender">Género</Label>
-                    <Select name="gender">
+                    <Select 
+                      name="gender"
+                      required
+                      value={gender} 
+                      onValueChange={(value) => setGender(value)}
+                    >
                       <SelectTrigger className="w-full">
                         <SelectValue placeholder="Selecciona el género" />
                       </SelectTrigger>
@@ -188,17 +287,44 @@ export function TeamSwitcher({
                       placeholder="Peso en kilogramos"
                       min="1"
                       max="90"
+                      required
+                      value={weight}
+                      onChange={(e) => setWeight(Number(e.target.value))}
                     />
                   </div>
 
                   <div className="flex flex-col gap-1">
                     <Label htmlFor="birthday">Fecha de Nacimiento</Label>
-                    <Input id="birthday" type="date" />
+                    <DatePicker selected={birthday} onSelect={setBirthday}/>
+                  </div>
+
+                  <div className="flex flex-col gap-1">
+                    
+                    {photo && (
+                      <div>
+                        <Label htmlFor="birthday">Imágen</Label>
+                        <img
+                          src={photo}
+                          alt={`Imagen de la raza ${breed}`}
+                          className="w-32 h-32 object-cover rounded-lg"
+                        />
+                        <RotateCw 
+                          className="cursor-pointer"
+                          onClick={() => handleChangePhoto(breed)}
+                        />
+                      </div>
+                    )}
                   </div>
                 </div>
 
                 <DialogFooter>
-                  <Button type="button" onClick={() => setOpenDialog(false)}>
+                  <Button 
+                    type="button" 
+                    onClick={async (e) => {
+                      await handleSubmit(e)
+                      setOpenDialog(false)
+                    }}                    
+                    >
                     Guardar
                   </Button>
                 </DialogFooter>

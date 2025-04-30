@@ -11,3 +11,11 @@ export type PetsName = {
     id: number
     name: string
 }[]
+
+export type PetCardProps = {
+    id: number
+    name: string
+    breed: string
+    weight: number
+    photo: string
+}

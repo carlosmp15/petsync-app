@@ -1,4 +1,4 @@
-import React, { useEffect } from "react"
+import React, { useEffect, useState } from "react"
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
@@ -10,58 +10,60 @@ import debounce from "just-debounce-it"
 import { useUserStore } from "@/stores/userStore"
 
 export default function LoginPage() {
-    const navigate = useNavigate()
-
-    useEffect(() => {
-        const user = localStorage.getItem("user")
-        if (user) navigate("/")
-   }, [navigate])
+  const [email, setEmail] = useState("")
+  const [password, setPassword] = useState("")
+  
+  const navigate = useNavigate()
 
   const handleSubmit = async (event: React.FormEvent) => {
     event.preventDefault()
 
-    // Obteniendo datos del formulario
-    const form = event.target as HTMLFormElement
-    const email = (form.elements.namedItem("email") as HTMLInputElement).value
-    const password = (form.elements.namedItem("password") as HTMLInputElement).value
-
     const result = await authUsers(email, password)
     try {
-      if (result.success) {
-        // Guardamos el usuario en store con zustand 
-        const { name, surname, email, phone, birthday, id } = result.data.results;
-        const setUser = useUserStore.getState().setUser;
-
-        setUser({
-          name,
-          surname,
-          email,
-          phone,
-          birthday,
-          id,
-        });
-
-        // Usuario autenticado exitosamente
-        const debouncedNavigate = debounce(() => {
-            navigate("/")
-        }, 2200)
-
-        localStorage.setItem("user", JSON.stringify(result.data.results))
+      if(email !== "" && password !== "") {
+        if (result.success) {
+          // Guardamos el usuario en store con zustand 
+          const { name, surname, email, phone, birthday, id } = result.data.results
+          const setUser = useUserStore.getState().setUser
+  
+          setUser({
+            name,
+            surname,
+            email,
+            phone,
+            birthday,
+            id,
+          })
+          setEmail("")
+          setPassword("")
+  
+          // Usuario autenticado exitosamente
+          const debouncedNavigate = debounce(() => {
+              navigate("/")
+          }, 2200)
+  
+          localStorage.setItem("user", JSON.stringify(result.data.results))
+            
+          toast.success(result.data.message, {
+              autoClose: 2000,
+          })
+          debouncedNavigate()
           
-        toast.success(result.data.message, {
+        } else {
+          toast.error(result.message, {
             autoClose: 2000,
-        })
-        debouncedNavigate()
-        
-      } else {
-        toast.error(result.message, {
-          autoClose: 2000,
-        })
+          })
+        }
       }
     } catch (error) {
       toast.error(result.data.message)
     }
   }
+
+  useEffect(() => {
+    const user = localStorage.getItem("user")
+    if (user) navigate("/")
+  }, [navigate])
 
   return (
     <div className="grid min-h-svh lg:grid-cols-2">
@@ -81,6 +83,7 @@ export default function LoginPage() {
                     id="email"
                     type="email"
                     placeholder="email@example.com"
+                    onChange={(e) => setEmail(e.target.value)}
                     required
                   />
                 </div>
@@ -90,6 +93,7 @@ export default function LoginPage() {
                     id="password"
                     type="password"
                     placeholder="••••••••"
+                    onChange={(e) => setPassword(e.target.value)}
                     required
                   />
                   <NavLink

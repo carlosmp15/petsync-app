@@ -56,6 +56,22 @@ export async function updateUserData(id: number | undefined, name: string, surna
   }
 }
 
+// Actualiza los datos personales de un usuario
+export async function deleteUser(id: number | undefined) {
+  try {
+    const url = `${import.meta.env.VITE_API_URL}/user/${id}`
+    const response = await axios.delete(url)
+
+    if (response.status === OK_CODE) {
+      return { success: true, message: "Usuario eliminado correctamente." }
+    } else {
+      return { success: false, message: "No se ha podido eliminar el usuario." }
+    }    
+  } catch (error) {
+    return { success: false, message: "Ha ocurrido un error de conexión." }
+  }
+}
+
 
 
 
