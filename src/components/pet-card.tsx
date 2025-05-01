@@ -16,19 +16,31 @@ import {
   AlertDialogTitle,
 } from "@/components/ui/alert-dialog"
 import { PetCardProps } from "@/types"
+import { deletePet } from "@/services/PetService"
+import { toast, ToastContainer } from "react-toastify"
 
 
-export function PetCard({ id, name, breed, weight, photo }: PetCardProps) {
+export function PetCard({ id, name, breed, weight, photo, onDelete }: PetCardProps) {
   const [showDeleteDialog, setShowDeleteDialog] = useState(false)
+  const capitalize = (str: string) => str.charAt(0).toUpperCase() + str.slice(1).toLowerCase()
+
 
   const handleEdit = () => {
     // Implementar lógica para editar
     console.log("Editar mascota:", id)
   }
 
-  const handleDelete = () => {
-    // Implementar lógica para eliminar
-    console.log("Eliminar mascota:", id)
+  const handleDelete = async () => {
+    const result = await deletePet(id)
+      
+      if (result?.success) {
+        toast.success(result.data.data, {
+          autoClose: 2000
+        })
+        setTimeout(() => {
+          if (onDelete) onDelete(id);
+        }, 2300);
+      }
     setShowDeleteDialog(false)
   }
 
@@ -56,13 +68,13 @@ export function PetCard({ id, name, breed, weight, photo }: PetCardProps) {
                 </Button>
               </DropdownMenuTrigger>
               <DropdownMenuContent align="end">
-                <DropdownMenuItem onClick={handleEdit}>
+                <DropdownMenuItem className="cursor-pointer" onClick={handleEdit}>
                   <Pencil className="mr-2 h-4 w-4" />
                   Editar
                 </DropdownMenuItem>
                 <DropdownMenuItem
                   onClick={() => setShowDeleteDialog(true)}
-                  className="text-destructive focus:text-destructive"
+                  className="text-destructive focus:text-destructive cursor-pointer"
                 >
                   <Trash2 className="mr-2 h-4 w-4" />
                   Eliminar
@@ -70,13 +82,13 @@ export function PetCard({ id, name, breed, weight, photo }: PetCardProps) {
               </DropdownMenuContent>
             </DropdownMenu>
           </div>
-          <p className="text-sm text-muted-foreground mt-1">Perro</p>
         </CardContent>
-        <CardFooter className="p-4 pt-0 flex justify-between text-sm">
-          <div>Peso: {weight} kg</div>
-          <div>{breed}</div>
+        <CardFooter className="p-4 pt-0 flex-col items-start text-sm">
+          <p className="text-muted-foreground">{capitalize(breed)}</p>
+          <p>Peso: {weight} kg</p> 
         </CardFooter>
       </Card>
+      <ToastContainer />
 
       <AlertDialog open={showDeleteDialog} onOpenChange={setShowDeleteDialog}>
         <AlertDialogContent>
@@ -88,7 +100,7 @@ export function PetCard({ id, name, breed, weight, photo }: PetCardProps) {
           </AlertDialogHeader>
           <AlertDialogFooter>
             <AlertDialogCancel>Cancelar</AlertDialogCancel>
-            <AlertDialogAction onClick={handleDelete} className="bg-destructive text-destructive-foreground">
+            <AlertDialogAction onClick={handleDelete} className="bg-destructive text-destructive-foreground bg-red-800 hover:bg-red-700">
               Eliminar
             </AlertDialogAction>
           </AlertDialogFooter>

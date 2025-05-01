@@ -18,4 +18,5 @@ export type PetCardProps = {
     breed: string
     weight: number
     photo: string
+    onDelete?: (id: number) => void
 }

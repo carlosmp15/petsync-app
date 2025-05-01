@@ -1,42 +1,52 @@
 import { PetCard } from "@/components/pet-card"
 import { getAllPetsByUserId } from "@/services/PetService"
-import { PetCardProps } from "@/types";
-import { useEffect, useState } from "react";
+import { PetCardProps } from "@/types"
+import { getUserDataFromLocalStorage } from "@/utils"
+import { useEffect, useState } from "react"
 
 export default function HomePage() {
   const [pets, setPets] = useState<PetCardProps[]>([])
+  const userData = getUserDataFromLocalStorage()
 
-  const fetchPetsUser = async() => {
-    const result = await getAllPetsByUserId(4);
-    if (result?.success) {
-      const pets: PetCardProps[] = result.data.map((pet: any) => ({
-        id: pet.id,
-        name: pet.name,
-        breed: pet.breed,
-        weight: Number(pet.weight),
-        photo: pet.photo,
-      }));
+  const fetchPetsUser = async () => {
+    const result = await getAllPetsByUserId(userData?.id);
   
-      console.log(pets);
-      setPets(pets);
+    if (result?.success) {
+      setPets(result.data.data)
     }
   }
+
+  const handleDeletePet = (id: number) => {
+    setPets((prevPets) => prevPets.filter((pet) => pet.id !== id))
+  }
+  
   useEffect(() => {
-    fetchPetsUser();
-  }, []);
+    fetchPetsUser()
+  }, [])
   
   
   return (
-    <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6">
-      { pets.map((pet) => (
-        <PetCard 
-        id={pet.id}
-        name={pet.name}
-        breed={pet.breed}
-        weight={pet.weight}
-        photo={pet.photo}
-      />
-      )) }   
+    <div className="px-4 sm:px-6 py-6">
+      <h1 className="text-3xl font-bold underline mb-6">Mis mascotas</h1>
+  
+      {pets.length === 0 ? (
+        <p className="text-gray-600">No tienes mascotas registradas.</p>
+      ) : (
+        <div className="flex flex-wrap gap-6">
+        {pets.map((pet) => (
+          <div key={pet.id} className="w-full sm:w-1/2 md:w-1/3 lg:w-1/4">
+            <PetCard
+              id={pet.id}
+              name={pet.name}
+              breed={pet.breed}
+              weight={pet.weight}
+              photo={pet.photo}
+              onDelete={handleDeletePet}
+            />
+          </div>
+        ))}
+      </div>
+      )}
     </div>
-  )
+  ) 
 }

@@ -217,7 +217,16 @@ const handleBreedInputChange = async (e: React.ChangeEvent<HTMLInputElement>) =>
               <div className="font-medium text-muted-foreground">Nueva mascota</div>
             </DropdownMenuItem>
 
-            <Dialog open={openDialog} onOpenChange={setOpenDialog}>
+            <Dialog
+              open={openDialog}
+              onOpenChange={(isOpen) => {
+                setOpenDialog(isOpen)
+                if (!isOpen) {
+                  resetPet()
+                  setPhoto("")
+                }
+              }}
+            >
               <DialogContent className="sm:max-w-[425px]">
                 <DialogHeader>
                   <DialogTitle>Nueva Mascota</DialogTitle>
@@ -225,7 +234,7 @@ const handleBreedInputChange = async (e: React.ChangeEvent<HTMLInputElement>) =>
                     Ingresa los datos de tu nueva mascota aquí.
                   </DialogDescription>
                 </DialogHeader>
-                <div className="grid gap-4 py-4">
+                <div className="grid gap-4 py-1">
                   <div className="flex flex-col gap-1">
                     <Label htmlFor="name">Nombre</Label>
                     <Input 
@@ -303,15 +312,17 @@ const handleBreedInputChange = async (e: React.ChangeEvent<HTMLInputElement>) =>
                     {photo && (
                       <div>
                         <Label htmlFor="birthday">Imágen</Label>
-                        <img
-                          src={photo}
-                          alt={`Imagen de la raza ${breed}`}
-                          className="w-32 h-32 object-cover rounded-lg"
-                        />
-                        <RotateCw 
-                          className="cursor-pointer"
-                          onClick={() => handleChangePhoto(breed)}
-                        />
+                        <div className="relative w-32 h-32">
+                          <img
+                            src={photo}
+                            alt={`Imagen de la raza ${breed}`}
+                            className="w-full h-full object-cover rounded-lg"
+                          />
+                          <RotateCw 
+                            className="absolute bottom-2 right-2 cursor-pointer bg-white rounded-full p-1 shadow"
+                            onClick={() => handleChangePhoto(breed)}
+                          />
+                        </div>
                       </div>
                     )}
                   </div>
