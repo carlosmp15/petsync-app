@@ -39,7 +39,9 @@ export default function HomePage() {
               id={pet.id}
               name={pet.name}
               breed={pet.breed}
+              gender={pet.gender}
               weight={pet.weight}
+              birthday={pet.birthday}
               photo={pet.photo}
               onDelete={handleDeletePet}
             />

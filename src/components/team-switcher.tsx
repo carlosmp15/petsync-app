@@ -1,6 +1,6 @@
 "use client"
 
-import { ChevronsUpDown, PawPrint, Plus, RotateCw } from "lucide-react"
+import { ChevronsUpDown, PawPrint, Plus } from "lucide-react"
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -16,33 +16,13 @@ import {
   useSidebar,
 } from "@/components/ui/sidebar"
 import { useEffect, useState } from "react"
-import {
-  Dialog,
-  DialogContent,
-  DialogDescription,
-  DialogFooter,
-  DialogHeader,
-  DialogTitle,
-} from "@/components/ui/dialog"
-
-import {
-  Select,
-  SelectContent,
-  SelectItem,
-  SelectTrigger,
-  SelectValue,
-} from "@/components/ui/select"
-
-import { Button } from "@/components/ui/button"
-import { Input } from "@/components/ui/input"
-import { Label } from "@/components/ui/label"
-import { createNewPet, getFilteredBreeds, getPetImage } from "@/services/PetService"
+import { createNewPet } from "@/services/PetService"
 import { usePetStore } from "@/stores/petStore"
 import { toast, ToastContainer } from "react-toastify"
 import { format } from "date-fns"
-import { DatePicker } from "./ui/date-picker"
 import { getUserDataFromLocalStorage } from "@/utils"
 import { useNavigate } from "react-router-dom"
+import { PetFormDialog } from "./PetFormDialog"
 
 
 export function TeamSwitcher({
@@ -57,7 +37,6 @@ export function TeamSwitcher({
   const { isMobile } = useSidebar()
   const [activeTeam, setActiveTeam] = useState(teams.length > 0 ? teams[0] : null)
   const [openDialog, setOpenDialog] = useState(false)
-  const [breedSuggestions, setBreedSuggestions] = useState<string[]>([])
   const userData = getUserDataFromLocalStorage()
   const navigate = useNavigate()
   const {
@@ -118,30 +97,6 @@ export function TeamSwitcher({
       }
     }
   }, [teams])
-
-const handleChangePhoto = async (selectedBreed: string) => {
-  const url = await getPetImage(selectedBreed)
-  if(url.success) {
-    if(url.message !== "") {
-      setPhoto(url.message)
-    }
-  }
-}
-
-const handleBreedInputChange = async (e: React.ChangeEvent<HTMLInputElement>) => {
-  const input = e.target.value;
-  setBreed(input);
-
-  if (input.length >= 2) {
-    const filtered = await getFilteredBreeds(input);
-    setBreedSuggestions(filtered.slice(0, 6)) // 6 primeros resultados
-  } else {
-    setBreedSuggestions([])
-  }
-  if (input && breedSuggestions.includes(input)) {
-    handleChangePhoto(input)
-  }
-}
 
 
   return (
@@ -217,130 +172,36 @@ const handleBreedInputChange = async (e: React.ChangeEvent<HTMLInputElement>) =>
               <div className="font-medium text-muted-foreground">Nueva mascota</div>
             </DropdownMenuItem>
 
-            <Dialog
+            { /* Formulario nueva mascota */ }
+            <PetFormDialog
               open={openDialog}
-              onOpenChange={(isOpen) => {
-                setOpenDialog(isOpen)
-                if (!isOpen) {
+              onOpenChange={(open) => {
+                setOpenDialog(open)
+                if (!open) {
                   resetPet()
                   setPhoto("")
                 }
               }}
-            >
-              <DialogContent className="sm:max-w-[425px]">
-                <DialogHeader>
-                  <DialogTitle>Nueva Mascota</DialogTitle>
-                  <DialogDescription>
-                    Ingresa los datos de tu nueva mascota aquí.
-                  </DialogDescription>
-                </DialogHeader>
-                <div className="grid gap-4 py-1">
-                  <div className="flex flex-col gap-1">
-                    <Label htmlFor="name">Nombre</Label>
-                    <Input 
-                      id="name" 
-                      placeholder="Nombre de la mascota" 
-                      required
-                      value={name}
-                      onChange={(e) => setName(e.target.value)}
-                    />
-                  
-                  </div>
+              onSubmit={async (e) => {
+                await handleSubmit(e)
+                setOpenDialog(false)
+              }}
+              title="Nueva Mascota"
+              description="Ingresa los datos de tu nueva mascota aquí."
+              name={name}
+              setName={setName}
+              breed={breed}
+              setBreed={setBreed}
+              gender={gender}
+              setGender={setGender}
+              weight={weight}
+              setWeight={setWeight}
+              birthday={birthday}
+              setBirthday={setBirthday}
+              photo={photo}
+              setPhoto={setPhoto}
+            />
 
-                  <div className="flex flex-col gap-1">
-                    <Label htmlFor="breed">Raza</Label>
-                    <Input
-                      id="breed"
-                      placeholder="Raza de la mascota (ej: Labrador)"
-                      required
-                      value={breed}
-                      onChange={handleBreedInputChange}
-                      list="breed-suggestions"
-                    />
-                    <datalist id="breed-suggestions">
-                      {breedSuggestions.length > 0 &&
-                        breedSuggestions.map((suggestion) => (
-                          <option 
-                            key={suggestion}
-                            value={suggestion}
-                          >
-                            {suggestion}
-                          </option>
-                        ))}
-                    </datalist>
-                  </div>
-
-                  <div className="flex flex-col gap-1">
-                    <Label htmlFor="gender">Género</Label>
-                    <Select 
-                      name="gender"
-                      required
-                      value={gender} 
-                      onValueChange={(value) => setGender(value)}
-                    >
-                      <SelectTrigger className="w-full">
-                        <SelectValue placeholder="Selecciona el género" />
-                      </SelectTrigger>
-                      <SelectContent> 
-                        <SelectItem value="male">Macho</SelectItem>
-                        <SelectItem value="female">Hembra</SelectItem>
-                      </SelectContent>
-                    </Select>
-                  </div>
-
-                  <div className="flex flex-col gap-1">
-                    <Label htmlFor="weight">Peso (kg)</Label>
-                    <Input
-                      id="weight"
-                      type="number"
-                      placeholder="Peso en kilogramos"
-                      min="1"
-                      max="90"
-                      required
-                      value={weight}
-                      onChange={(e) => setWeight(Number(e.target.value))}
-                    />
-                  </div>
-
-                  <div className="flex flex-col gap-1">
-                    <Label htmlFor="birthday">Fecha de Nacimiento</Label>
-                    <DatePicker selected={birthday} onSelect={setBirthday}/>
-                  </div>
-
-                  <div className="flex flex-col gap-1">
-                    
-                    {photo && (
-                      <div>
-                        <Label htmlFor="birthday">Imágen</Label>
-                        <div className="relative w-32 h-32">
-                          <img
-                            src={photo}
-                            alt={`Imagen de la raza ${breed}`}
-                            className="w-full h-full object-cover rounded-lg"
-                          />
-                          <RotateCw 
-                            className="absolute bottom-2 right-2 cursor-pointer bg-white rounded-full p-1 shadow"
-                            onClick={() => handleChangePhoto(breed)}
-                          />
-                        </div>
-                      </div>
-                    )}
-                  </div>
-                </div>
-
-                <DialogFooter>
-                  <Button 
-                    type="button" 
-                    onClick={async (e) => {
-                      await handleSubmit(e)
-                      setOpenDialog(false)
-                    }}                    
-                    >
-                    Guardar
-                  </Button>
-                </DialogFooter>
-              </DialogContent>
-            </Dialog>
 
           </DropdownMenuContent>
         </DropdownMenu>

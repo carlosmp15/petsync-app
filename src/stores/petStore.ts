@@ -16,7 +16,7 @@ type PetState = {
   setBreed: (value: string) => void
   setGender: (value: string) => void
   setWeight: (value: number) => void
-  setBirthday: (value: Date) => void
+  setBirthday: (value: Date | undefined) => void
   setPhoto: (value: string) => void
 
   setPet: (pet: { id: number, user_id: number, name: string, breed: string, gender: string, weight: number, birthday: string, photo: string }) => void

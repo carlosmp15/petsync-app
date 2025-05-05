@@ -116,6 +116,24 @@ export async function getAllPetsByUserId(userId: number | undefined) {
   }
 }
 
+// Función que actualiza los datos de una mascota
+export async function updatePetData(pet_id: number, name: string, breed: string, gender: string, weight: number, birthday: string, photo: string) {
+  try {
+    const url = `${import.meta.env.VITE_API_URL}/pet/${pet_id}`
+    const response = await axios.put(url, {
+      name, breed, gender, weight, birthday, photo
+    })
+
+    if (response.status === OK_CODE) {
+        return { success: true, message: "Mascota actualizada correctamente." }
+    } else {
+        return { success: true, message: "Error al actualizar la mascota" }
+    }
+  } catch (error) {
+    return { success: false, message: error }
+  }
+}
+
 // Función que elimina una mascota de un usuario por id
 export async function deletePet(petId: number | undefined) {
   try {

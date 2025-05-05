@@ -16,18 +16,78 @@ import {
   AlertDialogTitle,
 } from "@/components/ui/alert-dialog"
 import { PetCardProps } from "@/types"
-import { deletePet } from "@/services/PetService"
+import { deletePet, updatePetData } from "@/services/PetService"
 import { toast, ToastContainer } from "react-toastify"
+import { PetFormDialog } from "./PetFormDialog"
+import { usePetStore } from "@/stores/petStore"
+import { format } from "date-fns"
+import { useNavigate } from "react-router-dom"
 
 
-export function PetCard({ id, name, breed, weight, photo, onDelete }: PetCardProps) {
+export function PetCard({ id, name, breed, gender, weight, birthday, photo, onDelete }: PetCardProps) {
   const [showDeleteDialog, setShowDeleteDialog] = useState(false)
+  const [showUpdateDialog, setShowUpdateDialog] = useState(false)
+  const navigate = useNavigate()
+
+  const {
+    name: petName,
+    breed: petBreed,
+    gender: petGender,
+    weight: petWeight,
+    birthday: petBirthday,
+    photo: petPhoto,
+    setName,
+    setBreed,
+    setGender,
+    setWeight,
+    setBirthday,
+    setPhoto,
+    resetPet,
+  } = usePetStore()
+  
+
   const capitalize = (str: string) => str.charAt(0).toUpperCase() + str.slice(1).toLowerCase()
 
+  const handleSubmit = async (event: React.FormEvent) => {
+      event.preventDefault()
+  
+      if (!petName || !petBreed || !petGender || !petWeight || !petBirthday) {
+        toast.error("Todos los campos son obligatorios.")
+        return
+      }
+
+  
+      try {
+        const result = await updatePetData(id, petName, petBreed, petGender, petWeight, format(petBirthday, 'yyyy-MM-dd'), petPhoto)
+  
+        if (result?.success) {
+          setShowUpdateDialog(false)
+          resetPet()
+        
+          toast.success(result.message, {
+            autoClose: 2000,
+          })
+        
+          setTimeout(() => {
+            navigate(0)
+          }, 2300)
+        } else {
+          toast.error(result?.message)
+        }
+      } catch (error) {
+        console.error("Error en handleUpdate:", error)
+      }
+    }
 
   const handleEdit = () => {
-    // Implementar lógica para editar
-    console.log("Editar mascota:", id)
+    setName(name)
+    setBreed(breed)
+    setGender(gender)
+    setWeight(weight)
+    setBirthday((birthday))
+    setPhoto(photo)
+
+    setShowUpdateDialog(true)
   }
 
   const handleDelete = async () => {
@@ -89,6 +149,26 @@ export function PetCard({ id, name, breed, weight, photo, onDelete }: PetCardPro
         </CardFooter>
       </Card>
       <ToastContainer />
+
+      <PetFormDialog
+        open={showUpdateDialog}
+        onOpenChange={setShowUpdateDialog}
+        onSubmit={handleSubmit}
+        title="Editar Mascota"
+        description="Modifica los datos de tu mascota."
+        name={petName}
+        setName={setName}
+        breed={petBreed}
+        setBreed={setBreed}
+        gender={petGender}
+        setGender={setGender}
+        weight={petWeight}
+        setWeight={setWeight}
+        birthday={petBirthday}
+        setBirthday={setBirthday}
+        photo={petPhoto}
+        setPhoto={setPhoto}
+      />
 
       <AlertDialog open={showDeleteDialog} onOpenChange={setShowDeleteDialog}>
         <AlertDialogContent>
