@@ -54,14 +54,17 @@ export default function SettingsPage() {
   
 
   const validatePasswords = () => {
-    if (password && confirmPasswd) {
-      if (password !== confirmPasswd || confirmPasswd !== password || password !== "" || confirmPasswd !== "") {
-        setError("Las contraseñas no coinciden")
-      } else {
-        setError("")
-      }
+    if (!password && !confirmPasswd) {
+      setError("")
+      return
     }
-  }
+
+    if (password !== confirmPasswd) {
+      setError("Las contraseñas no coinciden")
+    } else {
+      setError("")
+    }
+  };
   
 
   useEffect(() => {
@@ -120,7 +123,6 @@ export default function SettingsPage() {
   const handleDeleteAccount = async () => {
     try {
       const result = await deleteUser(userData?.id);
-      console.log(result);
       if (result?.success) {
         
         setIsOpenDelete(false)

@@ -1,5 +1,3 @@
-"use client"
-
 import {
   Dialog,
   DialogContent,
@@ -17,7 +15,7 @@ import { DatePicker } from "@/components/ui/date-picker"
 import { useEffect, useState } from "react"
 import { getFilteredBreeds, getPetImage } from "@/services/PetService"
 import { PetFormDialogProps } from "@/types"
-
+import { useForm, Controller } from "react-hook-form"
 
 export function PetFormDialog({
   open,
@@ -26,21 +24,33 @@ export function PetFormDialog({
   title,
   description,
   name,
-  setName,
   breed,
-  setBreed,
   gender,
-  setGender,
   weight,
-  setWeight,
   birthday,
-  setBirthday,
   photo,
   setPhoto
 }: PetFormDialogProps) {
   const [breedSuggestions, setBreedSuggestions] = useState<string[]>([])
 
+  const {
+    control,
+    register,
+    handleSubmit,
+    setValue,
+    formState: { errors }
+  } = useForm({
+    defaultValues: {
+      name,
+      breed,
+      gender,
+      weight,
+      birthday
+    }
+  })
+
   useEffect(() => {
+    // Si la raza cambia, actualizar la foto de la mascota
     if (breed && breedSuggestions.includes(breed)) {
       handleChangePhoto(breed)
     }
@@ -55,7 +65,7 @@ export function PetFormDialog({
 
   const handleBreedInputChange = async (e: React.ChangeEvent<HTMLInputElement>) => {
     const input = e.target.value
-    setBreed(input)
+    setValue("breed", input)
 
     if (input.length >= 2) {
       const filtered = await getFilteredBreeds(input)
@@ -63,6 +73,12 @@ export function PetFormDialog({
     } else {
       setBreedSuggestions([])
     }
+  }
+
+  const onValidSubmit = (data: any) => {
+    // Actualizamos los valores del formulario en el estado principal.
+    setPhoto(data.photo) // Actualizar la foto si es necesario.
+    onSubmit(data) // Pasamos los datos de la mascota actualizados al componente principal.
   }
 
   return (
@@ -73,49 +89,82 @@ export function PetFormDialog({
           <DialogDescription>{description}</DialogDescription>
         </DialogHeader>
 
-        <div className="grid gap-4 py-1">
+        <form onSubmit={handleSubmit(onValidSubmit)} className="grid gap-4 py-1">
           <div className="flex flex-col gap-1">
             <Label htmlFor="name">Nombre</Label>
-            <Input 
-              id="name" 
-              placeholder="Nombre de la mascota" 
-              required 
-              value={name} 
-              onChange={(e) => setName(e.target.value)} />
+            <Input
+              id="name"
+              placeholder="Nombre de la mascota"
+              {...register("name", { required: "El nombre es obligatorio" })}
+            />
+            {errors.name && <span className="text-sm text-red-500">{errors.name.message}</span>}
           </div>
 
           <div className="flex flex-col gap-1">
             <Label htmlFor="breed">Raza</Label>
-            <Input 
-              id="breed" 
+            <Input
+              id="breed"
               placeholder="Raza de la mascota (ej: Labrador)"
-              required 
-              value={breed} 
-              onChange={handleBreedInputChange} list="breed-suggestions" />
+              list="breed-suggestions"
+              {...register("breed", { required: "La raza es obligatoria" })}
+              onChange={handleBreedInputChange}
+            />
             <datalist id="breed-suggestions">
               {breedSuggestions.map((s) => <option key={s} value={s} />)}
             </datalist>
+            {errors.breed && <span className="text-sm text-red-500">{errors.breed.message}</span>}
           </div>
 
           <div className="flex flex-col gap-1">
             <Label htmlFor="gender">Género</Label>
-            <Select value={gender} onValueChange={setGender}>
-              <SelectTrigger><SelectValue placeholder="Selecciona el género" /></SelectTrigger>
-              <SelectContent>
-                <SelectItem value="male" className="cursor-pointer">Macho</SelectItem>
-                <SelectItem value="female" className="cursor-pointer">Hembra</SelectItem>
-              </SelectContent>
-            </Select>
+            <Controller
+              name="gender"
+              control={control}
+              rules={{ required: "El género es obligatorio" }}
+              render={({ field }) => (
+                <Select
+                  value={field.value}
+                  onValueChange={field.onChange}
+                >
+                  <SelectTrigger>
+                    <SelectValue placeholder="Selecciona el género" />
+                  </SelectTrigger>
+                  <SelectContent>
+                    <SelectItem value="male">Macho</SelectItem>
+                    <SelectItem value="female">Hembra</SelectItem>
+                  </SelectContent>
+                </Select>
+              )}
+            />
+            {errors.gender && <span className="text-sm text-red-500">{errors.gender.message}</span>}
           </div>
 
           <div className="flex flex-col gap-1">
             <Label htmlFor="weight">Peso (kg)</Label>
-            <Input id="weight" type="number" min="1" max="90" value={weight} onChange={(e) => setWeight(Number(e.target.value))} />
+            <Input
+              id="weight"
+              type="number"
+              min="1"
+              max="90"
+              {...register("weight", { required: "El peso es obligatorio", min: 1 })}
+            />
+            {errors.weight && <span className="text-sm text-red-500">{errors.weight.message}</span>}
           </div>
 
           <div className="flex flex-col gap-1">
             <Label htmlFor="birthday">Fecha de Nacimiento</Label>
-            <DatePicker selected={birthday} onSelect={setBirthday} />
+            <Controller
+              name="birthday"
+              control={control}
+              rules={{ required: "La fecha de nacimiento es obligatoria" }}
+              render={({ field }) => (
+                <DatePicker
+                  selected={field.value}
+                  onSelect={(date) => field.onChange(date)}
+                />
+              )}
+            />
+            {errors.birthday && <span className="text-sm text-red-500">{errors.birthday.message}</span>}
           </div>
 
           {photo && (
@@ -127,11 +176,11 @@ export function PetFormDialog({
               </div>
             </div>
           )}
-        </div>
 
-        <DialogFooter>
-          <Button type="button" onClick={onSubmit}>Guardar</Button>
-        </DialogFooter>
+          <DialogFooter>
+            <Button type="submit">Guardar</Button>
+          </DialogFooter>
+        </form>
       </DialogContent>
     </Dialog>
   )

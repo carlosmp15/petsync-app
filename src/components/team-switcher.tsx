@@ -49,8 +49,7 @@ export function TeamSwitcher({
     resetPet
   } = usePetStore()
 
-  const handleSubmit = async (event: React.FormEvent) => {
-    event.preventDefault()
+  const handleSubmit = async () => {
 
     if (!name || !breed || !gender || !weight || !birthday) {
       toast.error("Todos los campos son obligatorios.")
@@ -182,10 +181,11 @@ export function TeamSwitcher({
                   setPhoto("")
                 }
               }}
-              onSubmit={async (e) => {
-                await handleSubmit(e)
-                setOpenDialog(false)
-              }}
+              onSubmit={async () => {
+              await handleSubmit()
+              setOpenDialog(false)
+            }}
+
               title="Nueva Mascota"
               description="Ingresa los datos de tu nueva mascota aquí."
               name={name}

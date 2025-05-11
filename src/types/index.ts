@@ -23,6 +23,7 @@ export type PetCardProps = {
     onDelete?: (id: number) => void
 }
 
+
 export type PetFormDialogProps = {
     open: boolean
     onOpenChange: (open: boolean) => void
@@ -41,4 +42,30 @@ export type PetFormDialogProps = {
     setBirthday: (val: Date) => void
     photo?: string
     setPhoto: (val: string) => void
+}
+
+export type PetSelected = {
+    id: number
+    name: string
+}
+
+export type LoginFormInputs = {
+  email: string
+  password: string
+}
+
+export type RegisterFormInputs = {
+  name: string
+  surname: string
+  email: string
+  phone: string
+  password: string
+  birthday: Date
+}
+
+export type MedicalHistoryProps = {
+    id: number
+    type: string
+    description: string
+    date: Date
 }

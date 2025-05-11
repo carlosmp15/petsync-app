@@ -1,4 +1,4 @@
-import { User } from "@/types"
+import { PetSelected, User } from "@/types"
 import { NavigateFunction } from 'react-router-dom'
 
 export function getUserDataFromLocalStorage(): User | null {
@@ -7,6 +7,16 @@ export function getUserDataFromLocalStorage(): User | null {
     if (userData) {
         const user: User = JSON.parse(userData);
         return user;
+    }
+    return null;
+}
+
+export function getPetSelected(): PetSelected | null {
+    const petSelected = localStorage.getItem("selectedPet");
+  
+    if (petSelected) {
+        const pet: PetSelected = JSON.parse(petSelected);
+        return pet;
     }
     return null;
 }

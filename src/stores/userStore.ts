@@ -17,7 +17,7 @@ type UserState = {
   setBirthday: (value: Date) => void
   setId: (value: number) => void
 
-  setUser: (user: { name: string, surname: string, email: string, phone: string, birthday: string, id: number }) => void
+  setUser: (user: { name: string, surname: string, email: string, phone: string, birthday: Date, id: number }) => void
   resetUser: () => void
 }
 
