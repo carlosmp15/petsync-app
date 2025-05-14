@@ -64,7 +64,7 @@ export function PetCard({ id, name, breed, gender, weight, birthday, photo, onDe
           setShowUpdateDialog(false)
           resetPet()
         
-          toast.success(result.message, {
+          toast.success(result.message as string, {
             autoClose: 2000,
           })
         
@@ -72,7 +72,7 @@ export function PetCard({ id, name, breed, gender, weight, birthday, photo, onDe
             navigate(0)
           }, 2300)
         } else {
-          toast.error(result?.message)
+          toast.error(result?.message as string)
         }
       } catch (error) {
         console.error("Error en handleUpdate:", error)

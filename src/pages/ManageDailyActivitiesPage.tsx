@@ -16,7 +16,7 @@ import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@
 import { Label } from "@/components/ui/label"
 import { Textarea } from "@/components/ui/textarea"
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
-import { FeedingProps } from "@/types"
+import { DailyActivityProps } from "@/types"
 import { toast, ToastContainer } from "react-toastify"
 import {
   AlertDialog,
@@ -31,43 +31,28 @@ import {
 } from "@/components/ui/alert-dialog"
 import { DatePicker } from "@/components/ui/date-picker"
 import { useSelectedPetStore } from "@/stores/selectedPetStore"
-import { createNewFeeding, deleteFeeding, getAllFeedingsByPetId, updateFeeding } from "@/services/FeedingService"
+import { createNewDailyActivity, deleteDailyActivity, getAllDailyActivityByPetId, updateDailyActivity } from "@/services/DailyActivityService"
 import { Input } from "@/components/ui/input"
 
 
-const feedingTypes = [
-  "Croquetas / pienso seco",
-  "Comida húmeda enlatada",
-  "Dieta BARF (cruda o cocida)",
-  "Premios / snacks",
-  "Comida casera cocida",
-  "Leche para cachorros / gatitos",
-  "Alimento especializado (renal, hipoalergénico, etc.)",
-  "Suplementos alimenticios",
-  "Frutas y verduras permitidas",
-  "Comida medicada",
-  "Alimento para entrenamiento",
-  "Agua fresca",
-  "Otro"
-]
+const activityTypes = ["Paseo", "Juego", "Entrenamiento", "Cepillado", "Baño", "Descanso", "Socialización", "Otro"]
 
-
-export default function ManageFeedingsPage() {
-  const [feedings, setFeedings] = useState<FeedingProps[]>([])
+export default function ManageDailyActivitiesPage() {
+  const [dailyActivities, setDailyActivities] = useState<DailyActivityProps[]>([])
   const [selectedToDelete, setSelectedToDelete] = useState<number | null>(null)
   const { id } = useSelectedPetStore()
 
   const fetchMedicalHistories = async () => {
     try {
-      const result = await getAllFeedingsByPetId(id)
+      const result = await getAllDailyActivityByPetId(id)
 
       if (result?.success) {
-        setFeedings(result.data)
+        setDailyActivities(result.data)
       } else {
-        setFeedings([])
+        setDailyActivities([])
       }
     } catch (error) {
-      setFeedings([])
+      setDailyActivities([])
     }
   }
 
@@ -85,11 +70,11 @@ export default function ManageFeedingsPage() {
   // Estado para el formulario
   const [isOpen, setIsOpen] = useState(false)
   const [isEditMode, setIsEditMode] = useState(false)
-  const [currentRecord, setCurrentRecord] = useState<FeedingProps>({
+  const [currentRecord, setCurrentRecord] = useState<DailyActivityProps>({
     id: 0,
     type: "",
-    description: "",
-    quantity: 1,
+    duration: 1,
+    notes: "",
     date: new Date()
   })
 
@@ -99,35 +84,35 @@ export default function ManageFeedingsPage() {
     setCurrentRecord({
       id: 0,
       type: "",
-      description: "",
-      quantity: 0,
+      duration: 1,
+      notes: "",
       date: new Date()
     })
     setIsOpen(true)
   }
 
-  const handleEdit = (f: FeedingProps) => {
+  const handleEdit = (da: DailyActivityProps) => {
     setIsEditMode(true)
-    setCurrentRecord({ ...f })
+    setCurrentRecord({ ...da })
     setIsOpen(true)
   }
 
   const handleDelete = async (id: number) => {
     try {
-      const result = await deleteFeeding(id)
+      const result = await deleteDailyActivity(id)
       if(result?.success) {
-        setFeedings(feedings.filter((f) => f.id !== id))
-        toast.success("Historial alimentario eliminado correctamente", {
+        setDailyActivities(dailyActivities.filter((da) => da.id !== id))
+        toast.success("Actividad diaria eliminada correctamente", {
           autoClose: 2000
         })
       }
     } catch (error) {
-      toast.error("Error inesperado al eliminar un historial alimentario.")
+      toast.error("Error inesperado al eliminar una actividad diaria.")
     }
   }
 
   const handleSave = async () => {
-    if (!currentRecord.type || !currentRecord.description) {
+    if (!currentRecord.type || !currentRecord.duration) {
       toast.error("Todos los campos son obligatorios.", {
         autoClose: 2000,
       })
@@ -136,39 +121,42 @@ export default function ManageFeedingsPage() {
 
     try {
       if (isEditMode) {
-        const result = await updateFeeding(
+        const result = await updateDailyActivity(
           currentRecord.id,
           currentRecord.type,
-          currentRecord.description,
-          currentRecord.quantity,
+          currentRecord.duration,
+          currentRecord.notes,
           format(currentRecord.date, "yyyy-MM-dd")
         )
+        console.log(result)
         if (result?.success) {
-          setFeedings(
-            feedings.map((f) => (f.id === currentRecord.id ? currentRecord : f))
+          setDailyActivities(
+            dailyActivities.map((da) => (da.id === currentRecord.id ? currentRecord : da))
           )
-          toast.success("Historial alimentario actualizado correctamente.", {
+          toast.success("Actividad diaria actualizada correctamente.", {
             autoClose: 2000,
           })
         }
       } else {
-        const result = await createNewFeeding(
+        const result = await createNewDailyActivity(
           id,
           currentRecord.type,
-          currentRecord.description,
-          currentRecord.quantity,
+          currentRecord.duration,
+          currentRecord.notes,
           format(currentRecord.date, "yyyy-MM-dd")
         )
         if(result.success) {
-          setFeedings([...feedings, currentRecord])
-          toast.success("Historial alimentario añadido correctamente.", {
+          setDailyActivities([...dailyActivities, currentRecord])
+          toast.success("Actividad diaria añadida correctamente.", {
             autoClose: 2000,
           })
-        } 
+        }
+        
       }
+
       setIsOpen(false)
     } catch (error) {
-      toast.error("Error al guardar el historial alimentario.")
+      toast.error("Error al guardar el historial médico.")
     }
   }
 
@@ -177,18 +165,18 @@ export default function ManageFeedingsPage() {
     <div className="px-4 space-y-6 sm:px-6">
       <ToastContainer />
       <div className="flex justify-between items-center">
-        <h2 className="text-2xl font-bold">Historiales Alimentario</h2>
+        <h2 className="text-2xl font-bold">Actividades diarias</h2>
         <Dialog open={isOpen} onOpenChange={setIsOpen}>
           <DialogTrigger asChild>
             <Button onClick={handleAddNew}>
               <Plus className="mr-2 h-4 w-4" />
-              Añadir alimentación
+              Añadir actividad
             </Button>
           </DialogTrigger>
           <DialogContent className="sm:max-w-[500px]">
             <DialogHeader>
-              <DialogTitle>{isEditMode ? "Editar historial alimentario" : "Añadir historial alimentario"}</DialogTitle>
-              <DialogDescription>Complete los detalles del historial alimentario de su mascota.</DialogDescription>
+              <DialogTitle>{isEditMode ? "Editar actividad diaria" : "Añadir actividad diaria"}</DialogTitle>
+              <DialogDescription>Complete los detalles del historial médico de su mascota.</DialogDescription>
             </DialogHeader>
             <div className="grid gap-4 py-4">
               <div className="grid gap-2">
@@ -201,7 +189,7 @@ export default function ManageFeedingsPage() {
                     <SelectValue placeholder="Seleccione un tipo" />
                   </SelectTrigger>
                   <SelectContent>
-                    {feedingTypes.map((type) => (
+                    {activityTypes.map((type) => (
                       <SelectItem key={type} value={type} className="cursor-pointer">
                         {type}
                       </SelectItem>
@@ -210,32 +198,32 @@ export default function ManageFeedingsPage() {
                 </Select>
               </div>
               <div className="grid gap-2">
-                <Label htmlFor="description">Descripción</Label>
-                <Textarea
-                  id="description"
-                  value={currentRecord.description}
-                  onChange={(e) =>
-                    setCurrentRecord({
-                      ...currentRecord,
-                      description: e.target.value,
-                    })
-                  }
-                  placeholder="Describa el procedimiento o tratamiento"
-                />
-              </div>
-              <div className="grid gap-2">
-                <Label htmlFor="description">Cantidad {'(gramos)'}</Label>
+                <Label htmlFor="description">Duración {'(min)'}</Label>
                 <Input 
                   type="number"
                   min={1}
-                  placeholder="Ej. 100 g"
-                  value={currentRecord.quantity}
+                  placeholder="Ej. 30 min"
+                  value={currentRecord.duration}
                   onChange={(e) =>
                     setCurrentRecord({
                       ...currentRecord,
-                      quantity: +e.target.value,
+                      duration: +e.target.value,
                     })
                   }
+                />
+              </div>
+              <div className="grid gap-2">
+                <Label htmlFor="description">Notas</Label>
+                <Textarea
+                  id="description"
+                  value={currentRecord.notes}
+                  onChange={(e) =>
+                    setCurrentRecord({
+                      ...currentRecord,
+                      notes: e.target.value,
+                    })
+                  }
+                  placeholder="Ej. Jugó con otros perros en el parque y estuvo muy activo"
                 />
               </div>
               <div className="grid gap-2">
@@ -257,30 +245,30 @@ export default function ManageFeedingsPage() {
         </Dialog>
       </div>
 
-      {feedings.length === 0 ? (
-        <div className="text-center py-10 text-muted-foreground">No hay historiales alimentario registrados.</div>
+      {dailyActivities.length === 0 ? (
+        <div className="text-center py-10 text-muted-foreground">No hay actividades diarias registradas.</div>
       ) : (
         <div className="border rounded-md">
           <Table>
             <TableHeader>
               <TableRow>
                 <TableHead>Tipo</TableHead>
-                <TableHead>Descripción</TableHead>
-                <TableHead>Cantidad</TableHead>
+                <TableHead>Duración</TableHead>
+                <TableHead>Notas</TableHead>
                 <TableHead>Fecha</TableHead>
                 <TableHead className="text-right">Acciones</TableHead>
               </TableRow>
             </TableHeader>
             <TableBody>
-              {feedings.map((ms) => (
-                <TableRow key={ms.id}>
-                  <TableCell className="font-medium">{ms.type}</TableCell>
-                  <TableCell>{ms.description}</TableCell>
-                  <TableCell>{ms.quantity}{' gramos'}</TableCell>
-                  <TableCell>{format(ms.date, "dd/MM/yyyy", { locale: es })}</TableCell>
+              {dailyActivities.map((da) => (
+                <TableRow key={da.id}>
+                  <TableCell className="font-medium">{da.type}</TableCell>
+                  <TableCell>{da.duration}{' minutos'}</TableCell>
+                  <TableCell>{da.notes}</TableCell>
+                  <TableCell>{format(da.date, "dd/MM/yyyy", { locale: es })}</TableCell>
                   <TableCell className="text-right">
                     <div className="flex justify-end gap-2">
-                      <Button variant="ghost" size="icon" onClick={() => handleEdit(ms)}>
+                      <Button variant="ghost" size="icon" onClick={() => handleEdit(da)}>
                         <Pencil className="h-4 w-4" />
                         <span className="sr-only">Editar</span>
                       </Button>
@@ -289,7 +277,7 @@ export default function ManageFeedingsPage() {
                             <Button
                               variant="ghost"
                               size="icon"
-                              onClick={() => setSelectedToDelete(ms.id)}
+                              onClick={() => setSelectedToDelete(da.id)}
                             >
                               <Trash2 className="h-4 w-4" />
                               <span className="sr-only">Eliminar</span>
@@ -297,9 +285,9 @@ export default function ManageFeedingsPage() {
                           </AlertDialogTrigger>
                           <AlertDialogContent>
                             <AlertDialogHeader>
-                              <AlertDialogTitle>Eliminación de historial alimentario</AlertDialogTitle>
+                              <AlertDialogTitle>Eliminación de actividad diaria</AlertDialogTitle>
                               <AlertDialogDescription>
-                                Esta acción eliminará el historial alimentario permanentemente. ¿Deseas continuar?
+                                Esta acción eliminará la actividad diaria permanentemente. ¿Deseas continuar?
                               </AlertDialogDescription>
                             </AlertDialogHeader>
                             <AlertDialogFooter>

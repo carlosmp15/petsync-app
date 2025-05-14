@@ -1,3 +1,4 @@
+import { BreedsData } from "@/types"
 import axios from "axios"
 
 const OK_CODE = 200 // Código OK de la API
@@ -76,18 +77,18 @@ export async function getFilteredBreeds(searchTerm: string) {
     const response = await axios.get(url);
 
     if (response.status === 200) {
-      const data = response.data.message;
+      const data: BreedsData = response.data.message
       const allBreeds: string[] = [];
-
-      Object.entries(data).forEach(([breed, subBreeds]) => {
-        if (subBreeds.length === 0) {
-          allBreeds.push(breed); // solo raza
-        } else {
-          subBreeds.forEach(sub => {
-            allBreeds.push(`${breed} ${sub}`); // formato que espera la API
-          });
-        }
-      });
+          
+    Object.entries(data).forEach(([breed, subBreeds]) => {
+      if (subBreeds.length === 0) {
+        allBreeds.push(breed); // solo raza
+      } else {
+        subBreeds.forEach(sub => {
+          allBreeds.push(`${breed} ${sub}`);
+        });
+      }
+    });
 
       const lowerTerm = searchTerm.toLowerCase();
       return allBreeds.filter(breed => breed.toLowerCase().includes(lowerTerm));

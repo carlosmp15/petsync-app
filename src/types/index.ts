@@ -64,8 +64,28 @@ export type RegisterFormInputs = {
 }
 
 export type MedicalHistoryProps = {
-    id: number
-    type: string
-    description: string
-    date: Date
+  id: number
+  type: string
+  description: string
+  date: Date
+}
+
+export type DailyActivityProps = {
+  id: number
+  type: string
+  duration: number
+  notes: string
+  date: Date
+}
+
+export type FeedingProps = {
+  id: number
+  type: string
+  description: string
+  quantity: number
+  date: Date
+}
+
+export type BreedsData = {
+  [breed: string]: string[]
 }

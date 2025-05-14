@@ -1,9 +1,8 @@
 import { createNewMedicalHistory, deleteMedicalHistory, getAllMedicalHistoryByPetId, updateMedicalHistory } from "@/services/MedicalHistoryService"
-import { getPetSelected } from "@/utils"
 import { useEffect, useState } from "react"
 import { format } from "date-fns"
 import { es } from "date-fns/locale"
-import { CalendarIcon, Pencil, Plus, Trash2 } from "lucide-react"
+import { Pencil, Plus, Trash2 } from "lucide-react"
 import { Button } from "@/components/ui/button"
 import {
   Dialog,
@@ -18,10 +17,8 @@ import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@
 import { Label } from "@/components/ui/label"
 import { Textarea } from "@/components/ui/textarea"
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
-import { Calendar } from "@/components/ui/calendar"
-import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover"
 import { MedicalHistoryProps } from "@/types"
-import { toast } from "react-toastify"
+import { toast, ToastContainer } from "react-toastify"
 import {
   AlertDialog,
   AlertDialogAction,
@@ -34,6 +31,7 @@ import {
   AlertDialogTrigger,
 } from "@/components/ui/alert-dialog"
 import { DatePicker } from "@/components/ui/date-picker"
+import { useSelectedPetStore } from "@/stores/selectedPetStore"
 
 
 const medicalTypes = ["Vacunación", "Consulta general", "Cirugía", "Desparasitación", "Análisis", "Tratamiento", "Otro"]
@@ -41,19 +39,32 @@ const medicalTypes = ["Vacunación", "Consulta general", "Cirugía", "Desparasit
 export default function ManageMedicalHistoriesPage() {
   const [medicalHistories, setMedicalHistories] = useState<MedicalHistoryProps[]>([])
   const [selectedToDelete, setSelectedToDelete] = useState<number | null>(null)
-  const petSelected = getPetSelected()
+  const { id } = useSelectedPetStore()
 
   const fetchMedicalHistories = async () => {
-    const result = await getAllMedicalHistoryByPetId(petSelected?.id)
+    try {
+      const result = await getAllMedicalHistoryByPetId(id)
 
-    if (result?.success) {
-      setMedicalHistories(result.data)
+      if (result?.success) {
+        setMedicalHistories(result.data)
+      } else {
+        setMedicalHistories([])
+      }
+    } catch (error) {
+      setMedicalHistories([])
     }
   }
+
 
   useEffect(() => {
     fetchMedicalHistories()
   }, [])
+
+  useEffect(() => {
+    if (id !== undefined) {
+      fetchMedicalHistories()
+    }
+  }, [id])
 
   // Estado para el formulario
   const [isOpen, setIsOpen] = useState(false)
@@ -88,12 +99,12 @@ export default function ManageMedicalHistoriesPage() {
       const result = await deleteMedicalHistory(id)
       if(result?.success) {
         setMedicalHistories(medicalHistories.filter((ms) => ms.id !== id))
-        toast.success("El historial médico ha sido eliminado correctamente", {
+        toast.success("Historial médico eliminado correctamente", {
           autoClose: 2000
         })
       }
     } catch (error) {
-      toast.error("Error inesperado al eliminar la cuenta.")
+      toast.error("Error inesperado al eliminar un historial médico.")
     }
   }
 
@@ -117,26 +128,24 @@ export default function ManageMedicalHistoriesPage() {
           setMedicalHistories(
             medicalHistories.map((ms) => (ms.id === currentRecord.id ? currentRecord : ms))
           )
-          toast.success("El historial médico ha sido actualizado correctamente.", {
+          toast.success("Historial médico actualizado correctamente.", {
             autoClose: 2000,
           })
         }
       } else {
         const result = await createNewMedicalHistory(
-          petSelected?.id,
+          id,
           currentRecord.type,
           currentRecord.description,
           format(currentRecord.date, "yyyy-MM-dd")
         )
         if(result.success) {
           setMedicalHistories([...medicalHistories, currentRecord])
-          toast.success("El historial médico ha sido añadido correctamente.", {
+          toast.success("Historial médico añadido correctamente.", {
             autoClose: 2000,
           })
-        }
-        
+        } 
       }
-
       setIsOpen(false)
     } catch (error) {
       toast.error("Error al guardar el historial médico.")
@@ -146,6 +155,7 @@ export default function ManageMedicalHistoriesPage() {
 
   return (
     <div className="px-4 space-y-6 sm:px-6">
+      <ToastContainer />
       <div className="flex justify-between items-center">
         <h2 className="text-2xl font-bold">Historiales Médicos</h2>
         <Dialog open={isOpen} onOpenChange={setIsOpen}>
@@ -172,7 +182,7 @@ export default function ManageMedicalHistoriesPage() {
                   </SelectTrigger>
                   <SelectContent>
                     {medicalTypes.map((type) => (
-                      <SelectItem key={type} value={type}>
+                      <SelectItem key={type} value={type} className="cursor-pointer">
                         {type}
                       </SelectItem>
                     ))}
@@ -213,7 +223,7 @@ export default function ManageMedicalHistoriesPage() {
       </div>
 
       {medicalHistories.length === 0 ? (
-        <div className="text-center py-10 text-muted-foreground">No hay historiales médicos registrados</div>
+        <div className="text-center py-10 text-muted-foreground">No hay historiales médicos registrados.</div>
       ) : (
         <div className="border rounded-md">
           <Table>

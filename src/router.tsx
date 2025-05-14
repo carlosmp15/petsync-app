@@ -8,7 +8,7 @@ import ChangePasswordPage from "./pages/ChangePassswordPage"
 import SidebarLayout from "./layouts/SidebarLayout"
 import SettingsPage from "./pages/SettingsPage"
 import ManageFeedingsPage from "./pages/ManageFeedingsPage"
-import ManageDailyActivities from "./pages/ManageDailyActivities"
+import ManageDailyActivities from "./pages/ManageDailyActivitiesPage"
 import ManageMedicalHistoriesPage from "./pages/ManageMedicalHistoriesPage"
 
 

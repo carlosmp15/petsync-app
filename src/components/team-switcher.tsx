@@ -23,22 +23,24 @@ import { format } from "date-fns"
 import { getUserDataFromLocalStorage } from "@/utils"
 import { useNavigate } from "react-router-dom"
 import { PetFormDialog } from "./PetFormDialog"
-
+import { useSelectedPetStore } from "@/stores/selectedPetStore"
 
 export function TeamSwitcher({
   teams,
 }: {
   teams: {
-    id: number,
+    id: number
     name: string
     logo: React.ElementType
   }[]
 }) {
   const { isMobile } = useSidebar()
-  const [activeTeam, setActiveTeam] = useState(teams.length > 0 ? teams[0] : null)
   const [openDialog, setOpenDialog] = useState(false)
+
+  const { id, setSelectedPet, resetSelectedPet } = useSelectedPetStore()
   const userData = getUserDataFromLocalStorage()
   const navigate = useNavigate()
+
   const {
     name, setName,
     breed, setBreed,
@@ -50,22 +52,26 @@ export function TeamSwitcher({
   } = usePetStore()
 
   const handleSubmit = async () => {
-
     if (!name || !breed || !gender || !weight || !birthday) {
       toast.error("Todos los campos son obligatorios.")
       return
     }
 
     try {
-      const result = await createNewPet(userData?.id, name, breed, gender, weight, format(birthday, 'yyyy-MM-dd'), photo)
+      const result = await createNewPet(
+        userData?.id,
+        name,
+        breed,
+        gender,
+        weight,
+        format(birthday, 'yyyy-MM-dd'),
+        photo
+      )
 
       if (result?.success) {
         resetPet()
-      
-        toast.success(result.message, {
-          autoClose: 2000,
-        })
-      
+        toast.success(result.message, { autoClose: 2000 })
+
         setTimeout(() => {
           navigate(0)
         }, 2300)
@@ -78,25 +84,19 @@ export function TeamSwitcher({
   }
 
   useEffect(() => {
-    const storedPet = localStorage.getItem('selectedPet')
-    
-    if (storedPet) {
-      const pet = JSON.parse(storedPet)
-      const selectedTeam = teams.find(team => team.id === pet.id)
-      if (selectedTeam) {
-        setActiveTeam(selectedTeam)
-      } else {
-        setActiveTeam(teams[0]) // si no encuentra la mascota selecciona el 1º
+    if (teams.length > 0) {
+      const selectedTeam = teams.find(team => team.id === id)
+
+      if (!selectedTeam) {
+        // Si no hay mascota seleccionada, selecciona la primera
+        setSelectedPet({ id: teams[0].id })
       }
     } else {
-      if (teams.length > 0) {
-        setActiveTeam(teams[0])
-      } else {
-        setActiveTeam(null)
-      }
+      resetSelectedPet()
     }
-  }, [teams])
+  }, [teams, id])
 
+  const activeTeam = teams.find(team => team.id === id) || null
 
   return (
     <SidebarMenu>
@@ -139,8 +139,7 @@ export function TeamSwitcher({
                 <DropdownMenuItem
                   key={team.name}
                   onClick={() => {
-                    setActiveTeam(team)
-                    localStorage.setItem('selectedPet', JSON.stringify({ id: team.id, name: team.name }))
+                    setSelectedPet({ id: team.id })
                   }}
                   className="gap-2 p-2 cursor-pointer"
                 >
@@ -171,7 +170,6 @@ export function TeamSwitcher({
               <div className="font-medium text-muted-foreground">Nueva mascota</div>
             </DropdownMenuItem>
 
-            { /* Formulario nueva mascota */ }
             <PetFormDialog
               open={openDialog}
               onOpenChange={(open) => {
@@ -182,10 +180,9 @@ export function TeamSwitcher({
                 }
               }}
               onSubmit={async () => {
-              await handleSubmit()
-              setOpenDialog(false)
-            }}
-
+                await handleSubmit()
+                setOpenDialog(false)
+              }}
               title="Nueva Mascota"
               description="Ingresa los datos de tu nueva mascota aquí."
               name={name}
@@ -201,8 +198,6 @@ export function TeamSwitcher({
               photo={photo}
               setPhoto={setPhoto}
             />
-
-
           </DropdownMenuContent>
         </DropdownMenu>
       </SidebarMenuItem>
