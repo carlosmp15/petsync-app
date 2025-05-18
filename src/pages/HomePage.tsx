@@ -30,7 +30,7 @@ export default function HomePage() {
       <h1 className="text-3xl font-bold underline mb-6">Mis mascotas</h1>
   
       {pets.length === 0 ? (
-        <p className="text-gray-600">No tienes mascotas registradas.</p>
+        <p className="text-muted-foreground">No tienes mascotas registradas.</p>
       ) : (
         <div className="flex flex-wrap gap-6">
         {pets.map((pet) => (

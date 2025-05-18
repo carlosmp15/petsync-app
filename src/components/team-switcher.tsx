@@ -18,12 +18,12 @@ import {
 import { useEffect, useState } from "react"
 import { createNewPet } from "@/services/PetService"
 import { usePetStore } from "@/stores/petStore"
-import { toast, ToastContainer } from "react-toastify"
+import { toast } from "react-toastify"
 import { format } from "date-fns"
-import { getUserDataFromLocalStorage } from "@/utils"
 import { useNavigate } from "react-router-dom"
 import { PetFormDialog } from "./PetFormDialog"
 import { useSelectedPetStore } from "@/stores/selectedPetStore"
+import { useUserStore } from "@/stores/userStore"
 
 export function TeamSwitcher({
   teams,
@@ -38,7 +38,7 @@ export function TeamSwitcher({
   const [openDialog, setOpenDialog] = useState(false)
 
   const { id, setSelectedPet, resetSelectedPet } = useSelectedPetStore()
-  const userData = getUserDataFromLocalStorage()
+  const { id: idUsuario } = useUserStore()
   const navigate = useNavigate()
 
   const {
@@ -59,7 +59,7 @@ export function TeamSwitcher({
 
     try {
       const result = await createNewPet(
-        userData?.id,
+        idUsuario,
         name,
         breed,
         gender,
@@ -89,7 +89,7 @@ export function TeamSwitcher({
 
       if (!selectedTeam) {
         // Si no hay mascota seleccionada, selecciona la primera
-        setSelectedPet({ id: teams[0].id })
+        setSelectedPet({ id: teams[0].id, name: teams[0].name })
       }
     } else {
       resetSelectedPet()
@@ -100,7 +100,6 @@ export function TeamSwitcher({
 
   return (
     <SidebarMenu>
-      <ToastContainer />
       <SidebarMenuItem>
         <DropdownMenu>
           <DropdownMenuTrigger asChild>
@@ -139,7 +138,7 @@ export function TeamSwitcher({
                 <DropdownMenuItem
                   key={team.name}
                   onClick={() => {
-                    setSelectedPet({ id: team.id })
+                    setSelectedPet({ id: team.id, name: team.name })
                   }}
                   className="gap-2 p-2 cursor-pointer"
                 >

@@ -6,9 +6,9 @@ import { Label } from "@/components/ui/label"
 import { authUsers } from "@/services/UserService"
 import { useNavigate, NavLink } from "react-router-dom"
 import { ToastContainer, toast } from "react-toastify"
-import debounce from "just-debounce-it"
 import { useUserStore } from "@/stores/userStore"
 import { LoginFormInputs } from "@/types"
+import { encryptData } from "@/utils"
 
 
 export default function LoginPage() {
@@ -31,13 +31,15 @@ export default function LoginPage() {
         const setUser = useUserStore.getState().setUser
 
         setUser({ name, surname, email, phone, birthday, id })
-        localStorage.setItem("user", JSON.stringify(result.data.results))
+        // localStorage.setItem("user", JSON.stringify(result.data.results))
+        localStorage.setItem("user", encryptData(result.data.results))
 
         toast.success(result.data.message, {
           autoClose: 2000,
+          onClose: () => {
+            navigate("/")
+          },
         })
-
-        debounce(() => navigate("/"), 2200)()
         reset()
       } else {
         toast.error(result.message, {
@@ -70,7 +72,7 @@ export default function LoginPage() {
                     id="email"
                     type="email"
                     placeholder="email@example.com"
-                    {...register("email", { required: "Email es requerido" })}
+                    {...register("email", { required: "Email requerido" })}
                   />
                   {errors.email && <span className="text-red-500 text-sm">{errors.email.message}</span>}
                 </div>
@@ -80,7 +82,7 @@ export default function LoginPage() {
                     id="password"
                     type="password"
                     placeholder="••••••••"
-                    {...register("password", { required: "Contraseña es requerida" })}
+                    {...register("password", { required: "Contraseña requerida" })}
                   />
                   {errors.password && <span className="text-red-500 text-sm">{errors.password.message}</span>}
                   <NavLink

@@ -1,5 +1,3 @@
-"use client"
-
 import { useState } from "react"
 import { MoreHorizontal, Pencil, Trash2 } from "lucide-react"
 import { Button } from "@/components/ui/button"
@@ -17,7 +15,7 @@ import {
 } from "@/components/ui/alert-dialog"
 import { PetCardProps } from "@/types"
 import { deletePet, updatePetData } from "@/services/PetService"
-import { toast, ToastContainer } from "react-toastify"
+import { toast } from "react-toastify"
 import { PetFormDialog } from "./PetFormDialog"
 import { usePetStore } from "@/stores/petStore"
 import { format } from "date-fns"
@@ -148,7 +146,6 @@ export function PetCard({ id, name, breed, gender, weight, birthday, photo, onDe
           <p>Peso: {weight} kg</p> 
         </CardFooter>
       </Card>
-      <ToastContainer />
 
       <PetFormDialog
         open={showUpdateDialog}

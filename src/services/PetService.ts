@@ -28,7 +28,7 @@ export async function createNewPet(user_id: number | undefined, name: string, br
     })
 
     if (response.status === OK_CODE) {
-        return { success: true, message: response.data.message }
+        return { success: true,  data: response.data.data, message: response.data.message }
     } else {
         return { success: true, message: "Error al crear la mascota" }
     }

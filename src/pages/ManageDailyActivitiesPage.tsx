@@ -17,7 +17,7 @@ import { Label } from "@/components/ui/label"
 import { Textarea } from "@/components/ui/textarea"
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
 import { DailyActivityProps } from "@/types"
-import { toast, ToastContainer } from "react-toastify"
+import { toast } from "react-toastify"
 import {
   AlertDialog,
   AlertDialogAction,
@@ -40,7 +40,7 @@ const activityTypes = ["Paseo", "Juego", "Entrenamiento", "Cepillado", "Baño", 
 export default function ManageDailyActivitiesPage() {
   const [dailyActivities, setDailyActivities] = useState<DailyActivityProps[]>([])
   const [selectedToDelete, setSelectedToDelete] = useState<number | null>(null)
-  const { id } = useSelectedPetStore()
+  const { id, name } = useSelectedPetStore()
 
   const fetchMedicalHistories = async () => {
     try {
@@ -162,13 +162,12 @@ export default function ManageDailyActivitiesPage() {
 
 
   return (
-    <div className="px-4 space-y-6 sm:px-6">
-      <ToastContainer />
-      <div className="flex justify-between items-center">
-        <h2 className="text-2xl font-bold">Actividades diarias</h2>
+    <div className="px-4 space-y-6 sm:px-6 py-5">
+      <div className="flex flex-col sm:flex-row sm:justify-between sm:items-center gap-2">
+        <h2 className="text-2xl font-bold w-full sm:w-auto underline">Actividades diarias {name}</h2>
         <Dialog open={isOpen} onOpenChange={setIsOpen}>
           <DialogTrigger asChild>
-            <Button onClick={handleAddNew}>
+            <Button onClick={handleAddNew} className="w-full sm:w-auto">
               <Plus className="mr-2 h-4 w-4" />
               Añadir actividad
             </Button>

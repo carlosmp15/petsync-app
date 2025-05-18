@@ -7,9 +7,9 @@ import { Avatar, AvatarImage, AvatarFallback } from "@/components/ui/avatar"
 import { PhoneInput } from "@/components/PhoneInput"
 import { DatePicker } from "@/components/ui/date-picker"
 import { deleteUser, updateUserData } from "@/services/UserService"
-import { toast, ToastContainer } from "react-toastify"
+import { toast } from "react-toastify"
 import { useUserStore } from "@/stores/userStore"
-import { getUserDataFromLocalStorage } from "@/utils"
+import { encryptData, getUserDataFromLocalStorage } from "@/utils"
 import { format } from 'date-fns'
 import {
   AlertDialog,
@@ -70,8 +70,7 @@ export default function SettingsPage() {
   useEffect(() => {
     const user = localStorage.getItem("user")
     if (user) {
-      const parsedUser = JSON.parse(user)
-      setUser(parsedUser)
+      setUser(userData)
     }
     setIsUserLoaded(true)
   }, [setUser])
@@ -103,16 +102,16 @@ export default function SettingsPage() {
           };
         
           localStorage.removeItem("user");
-          localStorage.setItem("user", JSON.stringify(updatedUser));
+          localStorage.setItem("user", encryptData(updatedUser));
           setUser(updatedUser);
 
           setIsOpenSave(false)
 
-          toast.success(result.message, {
+          toast.success(result.message as string, {
             autoClose: 2000
           })
         } else {
-          toast.error(result?.message || "Error al actualizar el usuario")
+          toast.error(result?.message as string || "Error al actualizar el usuario")
         }
       } catch (error) {
         toast.error("Error inesperado al actualizar")
@@ -148,7 +147,6 @@ export default function SettingsPage() {
         <header className="space-y-2">
           <h1 className="text-3xl font-bold underline pb-2">Mis datos personales</h1>
           <div className="flex items-center space-x-3">
-            <ToastContainer />
             <Avatar>
               <AvatarImage src="https://github.com/shadcn.png" />
               <AvatarFallback>CN</AvatarFallback>
@@ -292,7 +290,6 @@ export default function SettingsPage() {
               </AlertDialogFooter>
             </AlertDialogContent>
           </AlertDialog>
-
         </div>
       </div>
     </div>

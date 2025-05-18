@@ -39,11 +39,11 @@ export default function RegisterPage() {
 
     try {
       if (result?.success) {
-        toast.success(result.message, { autoClose: 2000 })
-
-        debounce(() => {
-          navigate("/account/login")
-        }, 2200)()
+        toast.success(result.message, { autoClose: 2000,
+          onClose: () => {
+            navigate("/account/login")
+          },
+         })
         reset()
       }
     } catch (error) {
@@ -126,7 +126,7 @@ export default function RegisterPage() {
                   <Controller
                     name="birthday"
                     control={control}
-                    rules={{ required: "Fecha requerida" }}
+                    rules={{ required: "Fecha nacimiento requerida" }}
                     render={({ field }) => (
                       <DatePicker selected={field.value} onSelect={field.onChange} />
                     )}

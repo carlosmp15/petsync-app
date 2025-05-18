@@ -1,25 +1,26 @@
-import { create } from "zustand"
+import { User } from "@/types";
+import { create } from "zustand";
 
 type UserState = {
-  name: string
-  surname: string
-  email: string
-  phone: string
-  password: string
-  birthday: Date | undefined
-  id: number | undefined
+  name: string;
+  surname: string;
+  email: string;
+  phone: string;
+  password: string;
+  birthday: Date | undefined;
+  id: number | undefined;
 
-  setName: (value: string) => void
-  setSurname: (value: string) => void
-  setEmail: (value: string) => void
-  setPhone: (value: string) => void
-  setPassword: (value: string) => void
-  setBirthday: (value: Date) => void
-  setId: (value: number) => void
+  setName: (value: string) => void;
+  setSurname: (value: string) => void;
+  setEmail: (value: string) => void;
+  setPhone: (value: string) => void;
+  setPassword: (value: string) => void;
+  setBirthday: (value: Date) => void;
+  setId: (value: number) => void;
 
-  setUser: (user: { name: string, surname: string, email: string, phone: string, birthday: Date, id: number }) => void
-  resetUser: () => void
-}
+  setUser: (user: User | null) => void;
+  resetUser: () => void;
+};
 
 export const useUserStore = create<UserState>((set) => ({
   name: "",
@@ -38,14 +39,28 @@ export const useUserStore = create<UserState>((set) => ({
   setBirthday: (value) => set({ birthday: value }),
   setId: (value) => set({ id: value }),
 
-  setUser: (user) => set({
-    name: user.name,
-    surname: user.surname,
-    email: user.email,
-    phone: user.phone,
-    birthday: new Date(user.birthday),
-    id: user.id,
-  }),
+  setUser: (user) => {
+    if (user) {
+      set({
+        name: user.name,
+        surname: user.surname,
+        email: user.email,
+        phone: user.phone,
+        birthday: new Date(user.birthday),
+        id: user.id,
+      });
+    } else {
+      set({
+        name: "",
+        surname: "",
+        email: "",
+        phone: "",
+        password: "",
+        birthday: undefined,
+        id: undefined,
+      });
+    }
+  },
 
   resetUser: () =>
     set({
@@ -57,4 +72,4 @@ export const useUserStore = create<UserState>((set) => ({
       birthday: undefined,
       id: undefined,
     }),
-}))
+}));

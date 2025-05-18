@@ -1,5 +1,6 @@
 import axios from "axios"
 import { format } from "date-fns"
+import { toast } from "react-toastify"
 
 const OK_CODE = 200 // Código OK de la API
 
@@ -52,7 +53,7 @@ export async function updateUserData(id: number | undefined, name: string, surna
       return { success: false, message: "No se han podido actualizar los datos personales. \nInténtelo de nuevo más tarde." }
     }    
   } catch (error) {
-    return { success: false, message: "Ha ocurrido un error de conexión." }
+    return { success: false, message: error}
   }
 }
 
@@ -70,6 +71,49 @@ export async function deleteUser(id: number | undefined) {
   } catch (error) {
     return { success: false, message: "Ha ocurrido un error de conexión." }
   }
+}
+
+// Envía un correo para restablecer la contraseña
+export async function forgotPassword(email: string) {
+  try {
+    const url = `${import.meta.env.VITE_API_URL}/forgot-password`
+    const response = await axios.post(url, { email })
+
+    return {
+      success: true,
+      message: response.data.message || "Revisa tu correo para restablecer la contraseña.",
+    }
+  } catch (error: any) {
+    const errorMessage =
+      error?.response?.data?.message || "Error al solicitar la recuperación de contraseña."
+    return {
+      success: false,
+      message: errorMessage,
+    }
+  }
+}
+
+
+// Cambia la contraseña de un usuario mediante un token
+export async function resetPassword(token: string, newPassword: string) {
+  try {
+    const url = `${import.meta.env.VITE_API_URL}/reset-password`
+    const response = await axios.post(url, {
+      token, newPassword
+    })
+
+    if (response.status === OK_CODE) {
+      return { success: true, message: "Contraseña actualizada con éxito." }
+    } else {
+      // return { success: false, message: "No se ha podido eliminar el usuario." }
+    }    
+  } catch (err: any) {
+      const errorMessage =
+        err?.response?.data?.message || "Error al cambiar la contraseña."
+
+      toast.error(errorMessage)
+    }
+
 }
 
 
