@@ -17,13 +17,12 @@ import {
 } from "@/components/ui/sidebar"
 import { useEffect, useState } from "react"
 import { createNewPet } from "@/services/PetService"
-import { usePetStore } from "@/stores/petStore"
+import { useSelectedPetStore } from "@/stores/selectedPetStore"
 import { toast } from "react-toastify"
 import { format } from "date-fns"
 import { useNavigate } from "react-router-dom"
 import { PetFormDialog } from "./PetFormDialog"
-import { useSelectedPetStore } from "@/stores/selectedPetStore"
-import { useUserStore } from "@/stores/userStore"
+import { getUserDataFromLocalStorage } from "@/utils"
 
 export function TeamSwitcher({
   teams,
@@ -38,57 +37,14 @@ export function TeamSwitcher({
   const [openDialog, setOpenDialog] = useState(false)
 
   const { id, setSelectedPet, resetSelectedPet } = useSelectedPetStore()
-  const { id: idUsuario } = useUserStore()
+  const userData = getUserDataFromLocalStorage()
   const navigate = useNavigate()
-
-  const {
-    name, setName,
-    breed, setBreed,
-    gender, setGender,
-    weight, setWeight,
-    birthday, setBirthday,
-    photo, setPhoto,
-    resetPet
-  } = usePetStore()
-
-  const handleSubmit = async () => {
-    if (!name || !breed || !gender || !weight || !birthday) {
-      toast.error("Todos los campos son obligatorios.")
-      return
-    }
-
-    try {
-      const result = await createNewPet(
-        idUsuario,
-        name,
-        breed,
-        gender,
-        weight,
-        format(birthday, 'yyyy-MM-dd'),
-        photo
-      )
-
-      if (result?.success) {
-        resetPet()
-        toast.success(result.message, { autoClose: 2000 })
-
-        setTimeout(() => {
-          navigate(0)
-        }, 2300)
-      } else {
-        toast.error(result?.message)
-      }
-    } catch (error) {
-      console.error("Error en handleUpdate:", error)
-    }
-  }
 
   useEffect(() => {
     if (teams.length > 0) {
       const selectedTeam = teams.find(team => team.id === id)
 
       if (!selectedTeam) {
-        // Si no hay mascota seleccionada, selecciona la primera
         setSelectedPet({ id: teams[0].id, name: teams[0].name })
       }
     } else {
@@ -97,6 +53,34 @@ export function TeamSwitcher({
   }, [teams, id])
 
   const activeTeam = teams.find(team => team.id === id) || null
+
+  const handleSubmitNewPet = async (data: any, photo: string) => {
+    try {
+      const result = await createNewPet(
+        userData?.id,
+        data.name,
+        data.breed,
+        data.gender,
+        data.weight,
+        format(data.birthday, 'yyyy-MM-dd'),
+        photo
+      )
+
+      if (result?.success) {
+        toast.success(result.message, { autoClose: 2000 })
+        setOpenDialog(false)
+
+        setTimeout(() => {
+          navigate(0)
+        }, 2300)
+      } else {
+        toast.error(result?.message || "Error al crear la mascota.")
+      }
+    } catch (error) {
+      console.error("Error creando mascota:", error)
+      toast.error("Hubo un error al guardar la mascota.")
+    }
+  }
 
   return (
     <SidebarMenu>
@@ -156,7 +140,7 @@ export function TeamSwitcher({
 
             <DropdownMenuSeparator />
 
-            <DropdownMenuItem 
+            <DropdownMenuItem
               className="gap-2 p-2 cursor-pointer"
               onSelect={(e) => {
                 e.preventDefault()
@@ -171,32 +155,14 @@ export function TeamSwitcher({
 
             <PetFormDialog
               open={openDialog}
-              onOpenChange={(open) => {
-                setOpenDialog(open)
-                if (!open) {
-                  resetPet()
-                  setPhoto("")
-                }
-              }}
-              onSubmit={async () => {
-                await handleSubmit()
-                setOpenDialog(false)
-              }}
-              title="Nueva Mascota"
-              description="Ingresa los datos de tu nueva mascota aquí."
-              name={name}
-              setName={setName}
-              breed={breed}
-              setBreed={setBreed}
-              gender={gender}
-              setGender={setGender}
-              weight={weight}
-              setWeight={setWeight}
-              birthday={birthday}
-              setBirthday={setBirthday}
-              photo={photo}
-              setPhoto={setPhoto}
-            />
+              onOpenChange={setOpenDialog}
+              onSubmit={handleSubmitNewPet} defaultPhoto={""} defaultValues={{
+                name: "",
+                breed: "",
+                gender: "",
+                weight: 0,
+                birthday: undefined
+              }}            />
           </DropdownMenuContent>
         </DropdownMenu>
       </SidebarMenuItem>

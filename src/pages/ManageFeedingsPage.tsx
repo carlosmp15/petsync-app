@@ -189,17 +189,17 @@ export default function ManageFeedingsPage() {
 
   return (
     <div className="px-4 space-y-6 sm:px-6 py-5">
+      <h2 className="text-2xl font-bold underline w-full sm:w-auto">
+        Historiales alimentarios {name}
+      </h2>
       {id === undefined && name === undefined ? (
         <p className="text-center py-10 text-muted-foreground">
-          No hay mascotas registradas para este usuario.<br/> Por favor, cree una
+          No hay mascotas registradas para este usuario.<br/> Por favor, añade una
           mascota para comenzar a gestionar su historial.
         </p>
       ) : (
         <>
-          <div className="flex flex-col sm:flex-row sm:justify-between sm:items-center gap-2">
-            <h2 className="text-2xl font-bold underline w-full sm:w-auto">
-              Historiales alimentarios {name}
-            </h2>
+          <div className="flex flex-col sm:flex-row sm:justify-end sm:items-center gap-2">
             <Dialog open={isOpen} onOpenChange={setIsOpen}>
               <DialogTrigger asChild>
                 <Button onClick={handleAddNew} className="w-full sm:w-auto">

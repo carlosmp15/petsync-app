@@ -89,7 +89,7 @@ export default function LoginPage() {
                     to="/account/forgot-password"
                     className="ml-auto inline-block text-sm underline-offset-4 hover:underline"
                   >
-                    ¿Has olvidado la contraseña?
+                    ¿Has olvidado tu contraseña?
                   </NavLink>
                 </div>
                 <Button type="submit" className="w-full">
