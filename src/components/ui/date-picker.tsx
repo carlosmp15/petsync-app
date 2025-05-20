@@ -11,15 +11,15 @@ import { useUserStore } from "@/stores/userStore"
 interface DatePickerProps {
   startYear?: number
   endYear?: number
-  selected?: Date
-  onSelect?: (value: Date) => void
+  selected?: Date | undefined
+  onChange?: (value: Date) => void
 }
 
 export function DatePicker({
   startYear = getYear(new Date()) - 100,
   endYear = getYear(new Date()) + 100,
   selected,
-  onSelect,
+  onChange,
 }: DatePickerProps) {
   const { birthday, setBirthday } = useUserStore() 
 
@@ -35,21 +35,21 @@ export function DatePicker({
   const handleMonthChange = (month: string) => {
     const newDate = setMonth(date, months.indexOf(month));
     setDate(newDate)
-    if (onSelect) onSelect(newDate) 
+    if (onChange) onChange(newDate) 
     else setBirthday(newDate)
   }
 
   const handleYearChange = (year: string) => {
     const newDate = setYear(date, parseInt(year));
     setDate(newDate)
-    if (onSelect) onSelect(newDate)
+    if (onChange) onChange(newDate)
     else setBirthday(newDate)
   }
 
   const handleSelect = (selectedData: Date | undefined) => {
     if (selectedData) {
       setDate(selectedData)
-      if (onSelect) onSelect(selectedData)
+      if (onChange) onChange(selectedData)
       else setBirthday(selectedData)
     }
   }

@@ -72,7 +72,13 @@ export default function LoginPage() {
                     id="email"
                     type="email"
                     placeholder="email@example.com"
-                    {...register("email", { required: "Email requerido" })}
+                    {...register("email", {
+                      required: "Email requerido",
+                      pattern: {
+                        value: /^[^\s@]+@[^\s@]+\.[^\s@]+$/,
+                        message: "Email no válido"
+                      }
+                    })}
                   />
                   {errors.email && <span className="text-red-500 text-sm">{errors.email.message}</span>}
                 </div>

@@ -35,7 +35,7 @@ export async function createNewUser(name: string, surname: string, email: string
       return { success: true, message: "Usuario dado de alta" }
     }
   } catch (error) {
-    return { success: false, message: "Ha ocurrido un error de conexión." }
+    return { success: false, message: error }
   }
 }
 

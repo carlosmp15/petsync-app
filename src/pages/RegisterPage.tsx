@@ -1,6 +1,6 @@
 import { useNavigate, NavLink } from "react-router-dom"
 import { useEffect } from "react"
-import { useForm, Controller } from "react-hook-form"
+import { useForm } from "react-hook-form"
 import { Label } from "@/components/ui/label"
 import { Input } from "@/components/ui/input"
 import { Button } from "@/components/ui/button"
@@ -17,7 +17,8 @@ export default function RegisterPage() {
   const {
     register,
     handleSubmit,
-    control,
+    setValue,
+    watch,
     formState: { errors },
     reset,
   } = useForm<RegisterFormInputs>()
@@ -39,15 +40,16 @@ export default function RegisterPage() {
 
     try {
       if (result?.success) {
-        toast.success(result.message, { autoClose: 2000,
+        toast.success(result.message as string, {
+          autoClose: 2000,
           onClose: () => {
             navigate("/account/login")
           },
-         })
+        })
         reset()
       }
     } catch (error) {
-      toast.error(result?.message || "Error en el registro")
+      toast.error(result?.message as string || "Error en el registro")
     }
   }
 
@@ -91,21 +93,22 @@ export default function RegisterPage() {
                     placeholder="email@example.com"
                     {...register("email", {
                       required: "Email requerido",
-                      pattern: { value: /^\S+@\S+$/i, message: "Formato de email inválido" }
+                      pattern: { value: /^\S+@\S+$/, message: "Formato de email inválido" },
                     })}
+                    onInvalid={(e) => e.preventDefault()}
                   />
                   {errors.email && <span className="text-red-500 text-sm">{errors.email.message}</span>}
                 </div>
 
                 <div className="grid gap-2">
                   <Label htmlFor="phone-number">Número de teléfono</Label>
-                  <Controller
-                    name="phone"
-                    control={control}
-                    rules={{ required: "Teléfono requerido" }}
-                    render={({ field }) => (
-                      <PhoneInput id="phone-number" name="phone-number" value={field.value} onChange={field.onChange} />
-                    )}
+                  <PhoneInput
+                    id="phone-number"
+                    name="phone-number"
+                    placeholder="Ej. 641 12 32 90"
+                    value={watch("phone") || ""}
+                    onChange={(value) => setValue("phone", value || "", { shouldValidate: true })}
+                    defaultCountry="ES"
                   />
                   {errors.phone && <span className="text-red-500 text-sm">{errors.phone.message}</span>}
                 </div>
@@ -123,13 +126,9 @@ export default function RegisterPage() {
 
                 <div className="grid gap-2">
                   <Label htmlFor="birthday">Fecha de nacimiento</Label>
-                  <Controller
-                    name="birthday"
-                    control={control}
-                    rules={{ required: "Fecha nacimiento requerida" }}
-                    render={({ field }) => (
-                      <DatePicker selected={field.value} onSelect={field.onChange} />
-                    )}
+                  <DatePicker
+                    selected={watch("birthday")}
+                    onChange={(date) => setValue("birthday", date, { shouldValidate: true })}
                   />
                   {errors.birthday && <span className="text-red-500 text-sm">{errors.birthday.message}</span>}
                 </div>

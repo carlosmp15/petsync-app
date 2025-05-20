@@ -5,7 +5,7 @@ import {
 } from "@/components/ui/sidebar"
 import { Outlet } from "react-router-dom"
 import { getAllPetsNameByUserId } from "@/services/PetService"
-import { decryptData, getUserDataFromLocalStorage } from "@/utils"
+import { getUserDataFromLocalStorage } from "@/utils"
 import { useEffect } from "react"
 import { usePetUserStore } from "@/stores/petUserStore"
 import { ToastContainer } from "react-toastify"

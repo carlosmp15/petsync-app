@@ -21,7 +21,7 @@ import {
 import { RotateCw } from "lucide-react"
 import { DatePicker } from "@/components/ui/date-picker"
 import { useEffect, useState } from "react"
-import { useForm } from "react-hook-form"
+import { Controller, useForm } from "react-hook-form"
 import { getFilteredBreeds, getPetImage } from "@/services/PetService"
 
 interface PetFormData {
@@ -29,7 +29,7 @@ interface PetFormData {
   breed: string
   gender: string
   weight: number
-  birthday: Date | undefined
+  birthday: Date | null
 }
 
 export interface PetFormDialogProps {
@@ -53,6 +53,7 @@ export function PetFormDialog({
     setValue,
     watch,
     reset,
+    control,
     formState: { errors },
   } = useForm<PetFormData>({
     defaultValues: {
@@ -60,13 +61,12 @@ export function PetFormDialog({
       breed: "",
       gender: "",
       weight: undefined,
-      birthday: undefined,
+      birthday: null,
       ...defaultValues,
     },
   })
 
   const breed = watch("breed")
-  const birthday = watch("birthday")
   const [photo, setPhoto] = useState(defaultPhoto)
   const [breedSuggestions, setBreedSuggestions] = useState<string[]>([])
 
@@ -171,22 +171,26 @@ export function PetFormDialog({
           {/* Género */}
           <div className="flex flex-col gap-1">
             <Label htmlFor="gender">Género</Label>
-            <Select
-              onValueChange={(value) => setValue("gender", value, { shouldValidate: true })}
-              defaultValue={watch("gender") || ""}
-            >
-              <SelectTrigger>
-                <SelectValue placeholder="Selecciona el género" />
-              </SelectTrigger>
-              <SelectContent>
-                <SelectItem value="male">Macho</SelectItem>
-                <SelectItem value="female">Hembra</SelectItem>
-              </SelectContent>
-            </Select>
+            <Controller
+              control={control}
+              name="gender"
+              rules={{ required: "El género es requerido" }}
+              defaultValue=""
+              render={({ field }) => (
+                <Select onValueChange={field.onChange} value={field.value}>
+                  <SelectTrigger>
+                    <SelectValue placeholder="Selecciona el género" />
+                  </SelectTrigger>
+                  <SelectContent>
+                    <SelectItem value="male">Macho</SelectItem>
+                    <SelectItem value="female">Hembra</SelectItem>
+                  </SelectContent>
+                </Select>
+              )}
+            />
+
             {errors.gender && (
-              <span className="text-red-500 text-sm">
-                {errors.gender.message || "El género es requerido"}
-              </span>
+              <p className="text-red-500 text-sm mt-1">{errors.gender.message}</p>
             )}
           </div>
 
@@ -195,8 +199,8 @@ export function PetFormDialog({
             <Label htmlFor="weight">Peso (kg)</Label>
             <Input
               type="number"
-              min={1}
               id="weight"
+              placeholder="Peso de la mascota"
               {...register("weight", {
                 valueAsNumber: true,
                 validate: (v) =>
@@ -209,15 +213,22 @@ export function PetFormDialog({
           </div>
 
           {/* Fecha de nacimiento */}
-          <div className="flex flex-col gap-1">
+           <div className="flex flex-col gap-1">
             <Label htmlFor="birthday">Fecha de nacimiento</Label>
-            <DatePicker
-              selected={birthday}
-              onSelect={(date) => setValue("birthday", date as Date, { shouldValidate: true })}
+            <Controller
+              control={control}
+              name="birthday"
+              rules={{ required: "Fecha de nacimiento requerida" }}
+              render={({ field }) => (
+                <DatePicker
+                  selected={field.value ?? undefined}
+                  onChange={(date: Date | undefined) => field.onChange(date)}
+                />
+              )}
             />
             {errors.birthday && (
               <span className="text-red-500 text-sm">
-                {errors.birthday.message || "Fecha de nacimiento requerida"}
+                {errors.birthday.message}
               </span>
             )}
           </div>

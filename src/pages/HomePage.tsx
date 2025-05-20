@@ -30,7 +30,13 @@ export default function HomePage() {
       <h1 className="text-3xl font-bold underline mb-6">Mis mascotas</h1>
   
       {pets.length === 0 ? (
-        <p className="text-muted-foreground">No tienes mascotas registradas.</p>
+        <div>
+          <p className="text-muted-foreground text-center">No tienes mascotas registradas.</p>
+          <p className=" text-muted-foreground mt-1 text-center">
+          Haz clic en <strong>"Nueva mascota"</strong> para registrar una y poder visualizarla aquí.
+          </p>
+
+        </div>
       ) : (
         <div className="flex flex-wrap gap-6">
         {pets.map((pet) => (
