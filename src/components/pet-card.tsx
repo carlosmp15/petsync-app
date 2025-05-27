@@ -132,6 +132,7 @@ export function PetCard({ id, name, breed, gender, weight, birthday, photo, onDe
           birthday: birthday ? new Date(birthday) : undefined,  // asegúrate que sea Date
         }}
         defaultPhoto={photo}
+        isEdit={true}
       />
 
 

@@ -1,5 +1,3 @@
-"use client"
-
 import {
   Dialog,
   DialogContent,
@@ -23,6 +21,7 @@ import { DatePicker } from "@/components/ui/date-picker"
 import { useEffect, useState } from "react"
 import { Controller, useForm } from "react-hook-form"
 import { getFilteredBreeds, getPetImage } from "@/services/PetService"
+import { is } from "date-fns/locale"
 
 interface PetFormData {
   name: string
@@ -38,6 +37,7 @@ export interface PetFormDialogProps {
   onSubmit: (data: PetFormData, newPhoto: string) => Promise<void>
   defaultPhoto?: string
   defaultValues?: Partial<PetFormData>
+  isEdit: boolean
 }
 
 export function PetFormDialog({
@@ -46,6 +46,7 @@ export function PetFormDialog({
   onSubmit,
   defaultPhoto = "",
   defaultValues,
+  isEdit
 }: PetFormDialogProps) {
   const {
     register,
@@ -83,7 +84,7 @@ export function PetFormDialog({
         breed: defaultValues?.breed || "",
         gender: defaultValues?.gender || "",
         weight: defaultValues?.weight || undefined,
-        birthday: defaultValues?.birthday || undefined,
+        birthday: isEdit && defaultValues?.birthday ? new Date(defaultValues.birthday) : null,
       })
       setPhoto(defaultPhoto)
     }
@@ -117,9 +118,10 @@ export function PetFormDialog({
     <Dialog open={open} onOpenChange={onOpenChange}>
       <DialogContent className="sm:max-w-[425px]">
         <DialogHeader>
-          <DialogTitle>{defaultValues ? "Editar Mascota" : "Nueva Mascota"}</DialogTitle>
+          
+          <DialogTitle>{isEdit ? "Editar Mascota" : "Nueva Mascota"}</DialogTitle>
           <DialogDescription>
-            {defaultValues
+            {isEdit
               ? "Modifica los datos de tu mascota."
               : "Ingresa los datos de tu nueva mascota."}
           </DialogDescription>

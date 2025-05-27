@@ -1,5 +1,3 @@
-"use client"
-
 import {
   ChevronsUpDown,
   LogOut,
@@ -43,6 +41,7 @@ export function NavUser({
   const { isMobile } = useSidebar()
   const { resetUser } = useUserStore()
   const navigate = useNavigate()
+  
 
   return (
     <SidebarMenu>

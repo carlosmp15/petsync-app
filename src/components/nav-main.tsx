@@ -1,7 +1,4 @@
-"use client";
-
 import { ChevronRight, Home, type LucideIcon } from "lucide-react";
-
 import {
   Collapsible,
   CollapsibleContent,
@@ -41,7 +38,7 @@ export function NavMain({
         <SidebarMenu>
           <SidebarMenuItem>
             <SidebarMenuButton asChild tooltip="Ir al inicio">
-              <NavLink to="/">
+              <NavLink to="/home">
                 <Home />
                 <span>Home</span>
               </NavLink>

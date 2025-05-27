@@ -24,6 +24,7 @@ import {
 } from "@/components/ui/alert-dialog"
 import { handleLogout } from "@/utils"
 import { useNavigate } from "react-router-dom"
+import { useUserUpdateStore } from "@/stores/userUpdated"
 
 export default function SettingsPage() {
   const [password, setPassword] = useState("")
@@ -33,6 +34,8 @@ export default function SettingsPage() {
 
   const [isUserLoaded, setIsUserLoaded] = useState(false) // estado de carga
   const [error, setError] = useState("")
+
+  const { setNeedsUpdate } = useUserUpdateStore()
 
   const {
     id, 
@@ -110,6 +113,9 @@ export default function SettingsPage() {
           toast.success(result.message as string, {
             autoClose: 2000
           })
+
+          setNeedsUpdate(true) // actualiza el estado de actualización del usuario
+
         } else {
           toast.error(result?.message as string || "Error al actualizar el usuario")
         }
@@ -206,7 +212,7 @@ export default function SettingsPage() {
               </div>
               <div className="space-y-2 flex flex-col">
                 <Label htmlFor="birthday">Fecha de nacimiento</Label>
-                <DatePicker selected={userData?.birthday} onSelect={setBirthday}/>
+                <DatePicker selected={userData?.birthday} onChange={setBirthday}/>
               </div>
             </CardContent>
           </Card>

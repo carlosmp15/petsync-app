@@ -1,5 +1,3 @@
-"use client"
-
 import { ChevronsUpDown, PawPrint, Plus } from "lucide-react"
 import {
   DropdownMenu,
@@ -19,10 +17,11 @@ import { useEffect, useState } from "react"
 import { createNewPet } from "@/services/PetService"
 import { useSelectedPetStore } from "@/stores/selectedPetStore"
 import { toast } from "react-toastify"
-import { format } from "date-fns"
+import { format, set } from "date-fns"
 import { useNavigate } from "react-router-dom"
 import { PetFormDialog } from "./PetFormDialog"
 import { getUserDataFromLocalStorage } from "@/utils"
+import { useUserUpdateStore } from "@/stores/userUpdated"
 
 export function TeamSwitcher({
   teams,
@@ -156,13 +155,10 @@ export function TeamSwitcher({
             <PetFormDialog
               open={openDialog}
               onOpenChange={setOpenDialog}
-              onSubmit={handleSubmitNewPet} defaultPhoto={""} defaultValues={{
-                name: "",
-                breed: "",
-                gender: "",
-                weight: 0,
-                birthday: undefined
-              }}            />
+              onSubmit={handleSubmitNewPet} 
+              defaultPhoto={""} 
+              isEdit={false}
+            />
           </DropdownMenuContent>
         </DropdownMenu>
       </SidebarMenuItem>

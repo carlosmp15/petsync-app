@@ -19,9 +19,20 @@ import {
   SidebarRail,
 } from "@/components/ui/sidebar"
 import { getUserDataFromLocalStorage } from "@/utils"
+import { useUserUpdateStore } from "@/stores/userUpdated"
+import { useEffect, useState } from "react"
 
 export function AppSidebar({ userPets = [], ...props }: { userPets: any[], [key: string]: any }) {
   const userData = getUserDataFromLocalStorage()
+  const { needsUpdate, setNeedsUpdate } = useUserUpdateStore()
+  const [renderKey, setRenderKey] = useState(0) // para forzar re-render
+
+  useEffect(() => {
+    if (needsUpdate) {
+      setRenderKey(prev => prev + 1)
+      setNeedsUpdate(false)
+    }
+  }, [needsUpdate, setNeedsUpdate])
 
   const data = {
     user: {
@@ -89,9 +100,9 @@ export function AppSidebar({ userPets = [], ...props }: { userPets: any[], [key:
   }
 
   return (
-    <Sidebar collapsible="icon" {...props}>
+    <Sidebar key={renderKey} collapsible="icon" {...props}>
       <SidebarHeader>
-        <TeamSwitcher teams={data.teams} />
+        <TeamSwitcher key={renderKey} teams={data.teams} />
       </SidebarHeader>
       <SidebarContent>
         <NavMain items={data.navMain} />

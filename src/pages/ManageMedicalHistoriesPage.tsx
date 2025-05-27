@@ -255,7 +255,7 @@ export default function ManageMedicalHistoriesPage() {
                     <Label htmlFor="date">Fecha</Label>
                     <DatePicker
                       selected={currentRecord.date}
-                      onSelect={(date: Date) =>
+                      onChange={(date: Date) =>
                         setCurrentRecord({
                           ...currentRecord,
                           date: date || new Date(),

@@ -100,7 +100,7 @@ export default function ManageDailyActivitiesPage() {
   const [currentRecord, setCurrentRecord] = useState<DailyActivityProps>({
     id: 0,
     type: "",
-    duration: 1,
+    duration: 0,
     notes: "",
     date: new Date(),
   });
@@ -278,7 +278,7 @@ export default function ManageDailyActivitiesPage() {
                     <Label htmlFor="date">Fecha</Label>
                     <DatePicker
                       selected={currentRecord.date}
-                      onSelect={(date: Date) =>
+                      onChange={(date: Date) =>
                         setCurrentRecord({
                           ...currentRecord,
                           date: date || new Date(),

@@ -40,9 +40,9 @@ export async function createNewFeeding(pet_id: number | undefined, type: string,
 }
 
 // Función que elimina un historial alimentario de una mascota por id
-export async function deleteFeeding(dailyActivityId: number | undefined) {
+export async function deleteFeeding(feeeding_id: number | undefined) {
   try {
-    const url = `${import.meta.env.VITE_API_URL}/feeding/${dailyActivityId}`
+    const url = `${import.meta.env.VITE_API_URL}/feeding/${feeeding_id}`
     const response = await axios.delete(url)
 
     if (response.status === OK_CODE) {
@@ -54,9 +54,9 @@ export async function deleteFeeding(dailyActivityId: number | undefined) {
 }
 
 // Función que actualiza un historial alimentario
-export async function updateFeeding(pet_id: number | undefined, type: string, description: string, quantity: number, date: string) {
+export async function updateFeeding(feeeding_id: number | undefined, type: string, description: string, quantity: number, date: string) {
   try {
-    const url = `${import.meta.env.VITE_API_URL}/feeding/${pet_id}`
+    const url = `${import.meta.env.VITE_API_URL}/feeding/${feeeding_id}`
     const response = await axios.put(url, {
       type, description, quantity, date
     })

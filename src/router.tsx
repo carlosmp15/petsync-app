@@ -10,12 +10,14 @@ import SettingsPage from "./pages/SettingsPage"
 import ManageFeedingsPage from "./pages/ManageFeedingsPage"
 import ManageDailyActivities from "./pages/ManageDailyActivitiesPage"
 import ManageMedicalHistoriesPage from "./pages/ManageMedicalHistoriesPage"
+import LandingPage from "./pages/LandingPage"
 
 
 export default function AppRouter() {
   return (
     <BrowserRouter>
       <Routes>
+        <Route path="/" element={<LandingPage />} />
         <Route path="/account/login" element={<LoginPage />} />
         <Route path="/account/register" element={<RegisterPage />} />
         <Route
@@ -34,7 +36,7 @@ export default function AppRouter() {
             </ProtectedRoute>
           }
         >
-          <Route path="/" element={<HomePage />} />
+          <Route path="/home" element={<HomePage />} />
           <Route path="/account/settings" element={<SettingsPage />} />
           <Route path="/pet/feedings" element={<ManageFeedingsPage />} />
           <Route path="/pet/daily-activities" element={<ManageDailyActivities />} />

@@ -3,10 +3,9 @@
   "private": true,
   "version": "0.0.0",
   "type": "module",
-  "homepage": "https://carlosm.cicloflorenciopintado.es/",
   "scripts": {
     "dev": "vite",
-    "build": "tsc -b && vite build",
+    "build": "vite build --base=./",
     "lint": "eslint .",
     "preview": "vite preview"
   },
@@ -24,7 +23,7 @@
     "@radix-ui/react-scroll-area": "^1.2.5",
     "@radix-ui/react-select": "^2.2.2",
     "@radix-ui/react-separator": "^1.1.4",
-    "@radix-ui/react-slot": "^1.2.2",
+    "@radix-ui/react-slot": "^1.2.3",
     "@radix-ui/react-toast": "^1.2.13",
     "@radix-ui/react-tooltip": "^1.2.3",
     "@types/react-router-dom": "^5.3.3",

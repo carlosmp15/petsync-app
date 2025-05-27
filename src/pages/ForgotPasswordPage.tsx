@@ -3,7 +3,7 @@ import { Input } from "@/components/ui/input"
 import { NavLink, useNavigate } from "react-router-dom"
 import { toast, ToastContainer } from "react-toastify"
 import { forgotPassword } from "@/services/UserService"
-import { useForm } from "react-hook-form"
+import { Controller, useForm } from "react-hook-form"
 import { useState } from "react"
 
 interface FormValues {
@@ -15,10 +15,13 @@ export default function ForgotPasswordPage() {
   const navigate = useNavigate()
 
   const {
-    register,
+    register, 
+    control,
     handleSubmit,
     formState: { errors }
-  } = useForm<FormValues>()
+  } = useForm<FormValues>({
+    defaultValues: { email: "" } 
+  })
 
   const onSubmit = async ({ email }: FormValues) => {
     setLoading(true)
@@ -52,16 +55,24 @@ export default function ForgotPasswordPage() {
         </div>
         <form className="space-y-6" onSubmit={handleSubmit(onSubmit)}>
           <div>
-            <Input
-              type="email"
-              placeholder="Correo electrónico"
-              {...register("email", {
+            <Controller
+              name="email"
+              control={control}
+              rules={{
                 required: "Email requerido",
                 pattern: {
                   value: /^[^\s@]+@[^\s@]+\.[^\s@]+$/,
                   message: "Introduce un email válido"
                 }
-              })}
+              }}
+              render={({ field }) => (
+                <Input
+                  type="email"
+                  placeholder="Correo electrónico"
+                  {...field}
+                  value={field.value || ""} // <-- asegurar que no sea undefined
+                />
+              )}
             />
             {errors.email && (
               <p className="mt-1 text-sm text-red-500">{errors.email.message}</p>

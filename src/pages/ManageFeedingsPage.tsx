@@ -158,6 +158,8 @@ export default function ManageFeedingsPage() {
           currentRecord.quantity,
           format(currentRecord.date, "yyyy-MM-dd")
         );
+        console.log(result);  
+        console.log("Id feeding", currentRecord.id);
         if (result?.success) {
           setFeedings(
             feedings.map((f) => (f.id === currentRecord.id ? currentRecord : f))
@@ -277,7 +279,7 @@ export default function ManageFeedingsPage() {
                     <Label htmlFor="date">Fecha</Label>
                     <DatePicker
                       selected={currentRecord.date}
-                      onSelect={(date: Date) =>
+                      onChange={(date: Date) =>
                         setCurrentRecord({
                           ...currentRecord,
                           date: date || new Date(),
