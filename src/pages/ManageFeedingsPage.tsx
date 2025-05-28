@@ -158,7 +158,6 @@ export default function ManageFeedingsPage() {
           currentRecord.quantity,
           format(currentRecord.date, "yyyy-MM-dd")
         );
-        console.log(result);  
         console.log("Id feeding", currentRecord.id);
         if (result?.success) {
           setFeedings(

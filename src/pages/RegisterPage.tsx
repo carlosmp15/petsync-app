@@ -32,7 +32,6 @@ export default function RegisterPage() {
   const onSubmit = async (data: RegisterFormInputs) => {
     try {
       const result = await createNewUser(data.name, data.surname, data.email, data.phone, data.password, data.birthday)
-      console.log(result)
       if (result?.success) {
         toast.success(result.message as string, {
           autoClose: 2000,

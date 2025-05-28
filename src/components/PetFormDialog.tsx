@@ -239,7 +239,7 @@ export function PetFormDialog({
           {photo && (
             <div>
               <Label>Imagen</Label>
-              <div className="relative w-32 h-32">
+              <div className="relative w-32 h-32 select-none">
                 <img
                   src={photo}
                   alt={`Raza ${breed}`}

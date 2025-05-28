@@ -95,11 +95,11 @@ export async function forgotPassword(email: string) {
 
 
 // Cambia la contraseña de un usuario mediante un token
-export async function resetPassword(token: string, newPassword: string) {
+export async function resetPassword(token: string, password: string) {
   try {
     const url = `${import.meta.env.VITE_API_URL}/reset-password`
     const response = await axios.post(url, {
-      token, newPassword
+      token, password
     })
 
     if (response.status === OK_CODE) {

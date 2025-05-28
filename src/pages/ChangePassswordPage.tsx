@@ -1,56 +1,56 @@
-import { useSearchParams, useNavigate, NavLink } from "react-router-dom"
-import { useForm } from "react-hook-form"
-import { Button } from "@/components/ui/button"
-import { Input } from "@/components/ui/input"
-import { toast, ToastContainer } from "react-toastify"
-import { resetPassword } from "@/services/UserService"
-import { useState } from "react"
+import { useSearchParams, useNavigate, NavLink } from "react-router-dom";
+import { useForm } from "react-hook-form";
+import { Button } from "@/components/ui/button";
+import { Input } from "@/components/ui/input";
+import { toast, ToastContainer } from "react-toastify";
+import { resetPassword } from "@/services/UserService";
+import { useState } from "react";
 
 interface FormValues {
-  password1: string
-  password2: string
+  password1: string;
+  password2: string;
 }
 
 export default function ChangePasswordPage() {
-  const [loading, setLoading] = useState(false)
-  const navigate = useNavigate()
-  const [params] = useSearchParams()
-  const token = params.get("token")
+  const [loading, setLoading] = useState(false);
+  const navigate = useNavigate();
+  const [params] = useSearchParams();
+  const token = params.get("token");
 
   const {
     register,
     handleSubmit,
     watch,
-    formState: { errors }
-  } = useForm<FormValues>()
+    formState: { errors },
+  } = useForm<FormValues>();
 
   const onSubmit = async ({ password1 }: FormValues) => {
     if (!token) {
       toast.error("Token no válido.", {
-        autoClose: 2000
-      })
-      return
+        autoClose: 2000,
+      });
+      return;
     }
 
-    setLoading(true)
+    setLoading(true);
     try {
-      const result = await resetPassword(token, password1)
+      const result = await resetPassword(token, password1);
       if (result?.success) {
         toast.success(result.message, {
           autoClose: 2000,
           onClose: () => {
-            navigate("/account/login")
-          }
-        })
+            navigate("/account/login");
+          },
+        });
       }
     } catch (error) {
       toast.error("Error al cambiar la contraseña.", {
-        autoClose: 2000
-      })
+        autoClose: 2000,
+      });
     } finally {
-      setLoading(false)
+      setLoading(false);
     }
-  }
+  };
 
   return (
     <div className="flex min-h-screen flex-col items-center justify-center bg-gray-50 py-12 px-4 dark:bg-gray-950">
@@ -68,10 +68,18 @@ export default function ChangePasswordPage() {
             <Input
               type="password"
               placeholder="Nueva contraseña"
-              {...register("password1", { required: "Contraseña requerida" })}
+              {...register("password1", {
+                required: "Contraseña requerida",
+                minLength: {
+                  value: 6,
+                  message: "La contraseña debe tener al menos 6 caracteres",
+                },
+              })}
             />
             {errors.password1 && (
-              <p className="mt-1 text-sm text-red-500">{errors.password1.message}</p>
+              <p className="mt-1 text-sm text-red-500">
+                {errors.password1.message}
+              </p>
             )}
           </div>
 
@@ -81,12 +89,15 @@ export default function ChangePasswordPage() {
               placeholder="Confirmar contraseña"
               {...register("password2", {
                 required: "Confirma tu contraseña",
-                validate: value =>
-                  value === watch("password1") || "Las contraseñas no coinciden."
+                validate: (value) =>
+                  value === watch("password1") ||
+                  "Las contraseñas no coinciden.",
               })}
             />
             {errors.password2 && (
-              <p className="mt-1 text-sm text-red-500">{errors.password2.message}</p>
+              <p className="mt-1 text-sm text-red-500">
+                {errors.password2.message}
+              </p>
             )}
           </div>
 
@@ -105,5 +116,5 @@ export default function ChangePasswordPage() {
       </div>
       <ToastContainer />
     </div>
-  )
+  );
 }

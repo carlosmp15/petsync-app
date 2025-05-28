@@ -68,9 +68,7 @@ export default function LoginPage() {
               className="flex flex-col items-center gap-4 mb-4 lg:hidden"
             >
               <h1 className="text-5xl font-bold text-primary">PetSync</h1>
-              <NavLink to="/">
                 <img src="/image.png" alt="PetSync Logo" className="w-32 h-32 object-contain border-2 border-zinc-400 rounded-full" />
-              </NavLink>
             </NavLink>
 
             <form onSubmit={handleSubmit(onSubmit)}>

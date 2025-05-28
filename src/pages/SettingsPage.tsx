@@ -51,7 +51,7 @@ export default function SettingsPage() {
   const navigate = useNavigate()
 
   useEffect(() => {
-    validatePasswords();
+    validatePasswords()
   }, [password, confirmPasswd])
 
   
@@ -62,12 +62,18 @@ export default function SettingsPage() {
       return
     }
 
+    if (password.length > 0 && password.length < 6) {
+      setError("La contraseña debe tener al menos 6 caracteres")
+      return
+    }
+
     if (password !== confirmPasswd) {
       setError("Las contraseñas no coinciden")
     } else {
       setError("")
     }
-  };
+  }
+
   
 
   useEffect(() => {
@@ -102,11 +108,13 @@ export default function SettingsPage() {
             phone: result.user.data.phone,
             birthday: result.user.data.birthday,
             id: result.user.data.id
-          };
+          }
+          setPassword("")
+          setConfirmPasswd("")
         
-          localStorage.removeItem("user");
-          localStorage.setItem("user", encryptData(updatedUser));
-          setUser(updatedUser);
+          localStorage.removeItem("user")
+          localStorage.setItem("user", encryptData(updatedUser))
+          setUser(updatedUser)
 
           setIsOpenSave(false)
 
@@ -127,22 +135,22 @@ export default function SettingsPage() {
 
   const handleDeleteAccount = async () => {
     try {
-      const result = await deleteUser(userData?.id);
+      const result = await deleteUser(userData?.id)
       if (result?.success) {
         
         setIsOpenDelete(false)
         toast.success(result.message, {
           autoClose: 2000
-        });
+        })
   
         setTimeout(() => {
-          handleLogout(navigate, resetUser);
-        }, 2500);
+          handleLogout(navigate, resetUser)
+        }, 2500)
       } else {
-        toast.error("Error al eliminar la cuenta: " + result?.message);
+        toast.error("Error al eliminar la cuenta: " + result?.message)
       }
     } catch (error) {
-      toast.error("Error inesperado al eliminar la cuenta.");
+      toast.error("Error inesperado al eliminar la cuenta.")
     }
   }
   
