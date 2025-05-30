@@ -12,7 +12,6 @@ import ManageDailyActivities from "./pages/ManageDailyActivitiesPage"
 import ManageMedicalHistoriesPage from "./pages/ManageMedicalHistoriesPage"
 import LandingPage from "./pages/LandingPage"
 
-
 export default function AppRouter() {
   return (
     <BrowserRouter>

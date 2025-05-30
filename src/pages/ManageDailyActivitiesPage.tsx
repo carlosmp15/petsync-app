@@ -1,3 +1,5 @@
+"use client";
+
 import { useEffect, useState } from "react";
 import { format } from "date-fns";
 import { es } from "date-fns/locale";
@@ -29,7 +31,7 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
-import { DailyActivityProps } from "@/types";
+import type { DailyActivityProps } from "@/types";
 import { toast } from "react-toastify";
 import {
   AlertDialog,
@@ -51,6 +53,7 @@ import {
   updateDailyActivity,
 } from "@/services/DailyActivityService";
 import { Input } from "@/components/ui/input";
+import { useForm, Controller } from "react-hook-form";
 
 const activityTypes = [
   "Paseo",
@@ -62,6 +65,13 @@ const activityTypes = [
   "Socialización",
   "Otro",
 ];
+
+interface ActivityFormData {
+  type: string;
+  duration: number;
+  notes: string;
+  date: Date;
+}
 
 export default function ManageDailyActivitiesPage() {
   const [dailyActivities, setDailyActivities] = useState<DailyActivityProps[]>(
@@ -105,11 +115,34 @@ export default function ManageDailyActivitiesPage() {
     date: new Date(),
   });
 
+  // React Hook Form setup
+  const {
+    control,
+    handleSubmit,
+    reset,
+    formState: { errors },
+    setValue,
+    watch,
+  } = useForm<ActivityFormData>({
+    defaultValues: {
+      type: "",
+      duration: undefined,
+      notes: "",
+      date: new Date(),
+    },
+  });
+
   // Función para abrir el formulario en modo añadir
   const handleAddNew = () => {
     setIsEditMode(false);
     setCurrentRecord({
       id: 0,
+      type: "",
+      duration: 1,
+      notes: "",
+      date: new Date(),
+    });
+    reset({
       type: "",
       duration: 1,
       notes: "",
@@ -121,6 +154,12 @@ export default function ManageDailyActivitiesPage() {
   const handleEdit = (da: DailyActivityProps) => {
     setIsEditMode(true);
     setCurrentRecord({ ...da });
+    reset({
+      type: da.type,
+      duration: da.duration,
+      notes: da.notes,
+      date: da.date,
+    });
     setIsOpen(true);
   };
 
@@ -138,28 +177,21 @@ export default function ManageDailyActivitiesPage() {
     }
   };
 
-  const handleSave = async () => {
-    if (!currentRecord.type || !currentRecord.duration) {
-      toast.error("Todos los campos son obligatorios.", {
-        autoClose: 2000,
-      });
-      return;
-    }
-
+  const onSubmit = async (data: ActivityFormData) => {
     try {
       if (isEditMode) {
         const result = await updateDailyActivity(
           currentRecord.id,
-          currentRecord.type,
-          currentRecord.duration,
-          currentRecord.notes,
-          format(currentRecord.date, "yyyy-MM-dd")
+          data.type,
+          data.duration,
+          data.notes,
+          format(data.date, "yyyy-MM-dd")
         );
         console.log(result);
         if (result?.success) {
           setDailyActivities(
             dailyActivities.map((da) =>
-              da.id === currentRecord.id ? currentRecord : da
+              da.id === currentRecord.id ? { ...currentRecord, ...data } : da
             )
           );
           toast.success("Actividad diaria actualizada correctamente.", {
@@ -169,13 +201,16 @@ export default function ManageDailyActivitiesPage() {
       } else {
         const result = await createNewDailyActivity(
           id,
-          currentRecord.type,
-          currentRecord.duration,
-          currentRecord.notes,
-          format(currentRecord.date, "yyyy-MM-dd")
+          data.type,
+          data.duration,
+          data.notes,
+          format(data.date, "yyyy-MM-dd")
         );
         if (result.success) {
-          setDailyActivities([...dailyActivities, currentRecord]);
+          setDailyActivities([
+            ...dailyActivities,
+            { ...currentRecord, ...data },
+          ]);
           toast.success("Actividad diaria añadida correctamente.", {
             autoClose: 2000,
           });
@@ -220,79 +255,149 @@ export default function ManageDailyActivitiesPage() {
                     Complete los detalles del historial médico de su mascota.
                   </DialogDescription>
                 </DialogHeader>
-                <div className="grid gap-4 py-4">
+                <form
+                  onSubmit={handleSubmit(onSubmit)}
+                  className="grid gap-4 py-4"
+                >
                   <div className="grid gap-2">
                     <Label htmlFor="type">Tipo</Label>
-                    <Select
-                      value={currentRecord.type}
-                      onValueChange={(value) =>
-                        setCurrentRecord({ ...currentRecord, type: value })
-                      }
-                    >
-                      <SelectTrigger id="type">
-                        <SelectValue placeholder="Seleccione un tipo" />
-                      </SelectTrigger>
-                      <SelectContent>
-                        {activityTypes.map((type) => (
-                          <SelectItem
-                            key={type}
-                            value={type}
-                            className="cursor-pointer"
-                          >
-                            {type}
-                          </SelectItem>
-                        ))}
-                      </SelectContent>
-                    </Select>
-                  </div>
-                  <div className="grid gap-2">
-                    <Label htmlFor="description">Duración {"(min)"}</Label>
-                    <Input
-                      type="number"
-                      min={1}
-                      placeholder="Ej. 30 min"
-                      value={currentRecord.duration}
-                      onChange={(e) =>
-                        setCurrentRecord({
-                          ...currentRecord,
-                          duration: +e.target.value,
-                        })
-                      }
+                    <Controller
+                      control={control}
+                      name="type"
+                      rules={{ required: "El tipo de actividad es requerido" }}
+                      render={({ field }) => (
+                        <Select
+                          onValueChange={field.onChange}
+                          value={field.value}
+                        >
+                          <SelectTrigger id="type">
+                            <SelectValue placeholder="Seleccione un tipo" />
+                          </SelectTrigger>
+                          <SelectContent>
+                            {activityTypes.map((type) => (
+                              <SelectItem
+                                key={type}
+                                value={type}
+                                className="cursor-pointer"
+                              >
+                                {type}
+                              </SelectItem>
+                            ))}
+                          </SelectContent>
+                        </Select>
+                      )}
                     />
+                    {errors.type && (
+                      <span className="text-red-500 text-sm">
+                        {errors.type.message}
+                      </span>
+                    )}
                   </div>
+
                   <div className="grid gap-2">
-                    <Label htmlFor="description">Notas</Label>
-                    <Textarea
-                      id="description"
-                      value={currentRecord.notes}
-                      onChange={(e) =>
-                        setCurrentRecord({
-                          ...currentRecord,
-                          notes: e.target.value,
-                        })
-                      }
-                      placeholder="Ej. Jugó con otros perros en el parque y estuvo muy activo"
+                    <Label htmlFor="duration">Duración {"(min)"}</Label>
+                    <Controller
+                      control={control}
+                      name="duration"
+                      rules={{
+                        required: "La duración es requerida",
+                        min: {
+                          value: 1,
+                          message: "La duración debe ser al menos 1 minuto",
+                        },
+                        max: {
+                          value: 1440,
+                          message: "Duración máx 1440 min (24 horas)",
+                        },
+                      }}
+                      render={({ field }) => (
+                        <Input
+                          type="number"
+                          id="duration"
+                          min={1}
+                          max={1440}
+                          placeholder="Ej. 30 min"
+                          value={field.value ?? ""}
+                          onChange={(e) => {
+                            const value = e.target.value;
+                            field.onChange(
+                              value === "" ? undefined : Number(value)
+                            );
+                          }}
+                        />
+                      )}
                     />
+                    {errors.duration && (
+                      <span className="text-red-500 text-sm">
+                        {errors.duration.message}
+                      </span>
+                    )}
                   </div>
+
+                  <div className="grid gap-2">
+                    <Label htmlFor="notes">Notas</Label>
+                    <Controller
+                      control={control}
+                      name="notes"
+                      rules={{
+                        required: "Las notas son requeridas",
+                        maxLength: {
+                          value: 500,
+                          message: "Las notas no pueden exceder 500 caracteres",
+                        },
+                      }}
+                      render={({ field }) => (
+                        <Textarea
+                          id="notes"
+                          {...field}
+                          placeholder="Ej. Jugó con otros perros en el parque y estuvo muy activo"
+                          maxLength={500}
+                        />
+                      )}
+                    />
+                    {errors.notes && (
+                      <span className="text-red-500 text-sm">
+                        {errors.notes.message}
+                      </span>
+                    )}
+                  </div>
+
                   <div className="grid gap-2">
                     <Label htmlFor="date">Fecha</Label>
-                    <DatePicker
-                      selected={currentRecord.date}
-                      onChange={(date: Date) =>
-                        setCurrentRecord({
-                          ...currentRecord,
-                          date: date || new Date(),
-                        })
-                      }
+                    <Controller
+                      control={control}
+                      name="date"
+                      rules={{ required: "La fecha es requerida" }}
+                      render={({ field }) => (
+                        <DatePicker
+                          selected={field.value}
+                          onChange={(date: Date | undefined) =>
+                            field.onChange(date || new Date())
+                          }
+                        />
+                      )}
                     />
+                    {errors.date && (
+                      <span className="text-red-500 text-sm">
+                        {errors.date.message}
+                      </span>
+                    )}
                   </div>
-                </div>
-                <DialogFooter>
-                  <Button variant="outline" onClick={() => setIsOpen(false)}>
-                    Cancelar
-                  </Button>
-                  <Button onClick={handleSave}>Guardar</Button>
-                </DialogFooter>
+
+                  <DialogFooter className="flex flex-col gap-3 md:flex-row md:gap-1 md:justify-end">
+                    <Button
+                      type="button"
+                      variant="outline"
+                      onClick={() => setIsOpen(false)}
+                      className="w-full md:w-auto"
+                    >
+                      Cancelar
+                    </Button>
+                    <Button type="submit" className="w-full md:w-auto">
+                      Guardar
+                    </Button>
+                  </DialogFooter>
+                </form>
               </DialogContent>
             </Dialog>
           </div>

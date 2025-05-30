@@ -1,9 +1,7 @@
-import { ChevronRight, Home, type LucideIcon } from "lucide-react";
-import {
-  Collapsible,
-  CollapsibleContent,
-  CollapsibleTrigger,
-} from "@/components/ui/collapsible";
+"use client"
+
+import { ChevronRight, Home, type LucideIcon } from "lucide-react"
+import { Collapsible, CollapsibleContent, CollapsibleTrigger } from "@/components/ui/collapsible"
 import {
   SidebarGroup,
   SidebarGroupLabel,
@@ -13,23 +11,32 @@ import {
   SidebarMenuSub,
   SidebarMenuSubButton,
   SidebarMenuSubItem,
-} from "@/components/ui/sidebar";
-import { NavLink } from "react-router-dom";
+  useSidebar,
+} from "@/components/ui/sidebar"
+import { NavLink } from "react-router-dom"
 
 export function NavMain({
   items,
 }: {
   items: {
-    title: string;
-    url: string;
-    icon?: LucideIcon;
-    isActive?: boolean;
+    title: string
+    url: string
+    icon?: LucideIcon
+    isActive?: boolean
     items?: {
-      title: string;
-      url: string;
-    }[];
-  }[];
+      title: string
+      url: string
+    }[]
+  }[]
 }) {
+  const { setOpenMobile, isMobile } = useSidebar()
+
+  const handleNavClick = () => {
+    if (isMobile) {
+      setOpenMobile(false)
+    }
+  }
+
   return (
     <div>
       {/* Home directo (sin desplegable) */}
@@ -38,7 +45,7 @@ export function NavMain({
         <SidebarMenu>
           <SidebarMenuItem>
             <SidebarMenuButton asChild tooltip="Ir al inicio">
-              <NavLink to="/home">
+              <NavLink to="/home" onClick={handleNavClick}>
                 <Home />
                 <span>Home</span>
               </NavLink>
@@ -52,12 +59,7 @@ export function NavMain({
         <SidebarGroupLabel>Salud y Bienestar</SidebarGroupLabel>
         <SidebarMenu>
           {items.map((item) => (
-            <Collapsible
-              key={item.title}
-              asChild
-              defaultOpen={item.isActive}
-              className="group/collapsible"
-            >
+            <Collapsible key={item.title} asChild defaultOpen={item.isActive} className="group/collapsible">
               <SidebarMenuItem>
                 <CollapsibleTrigger asChild>
                   <SidebarMenuButton tooltip={item.title}>
@@ -71,7 +73,7 @@ export function NavMain({
                     {item.items?.map((subItem) => (
                       <SidebarMenuSubItem key={subItem.title}>
                         <SidebarMenuSubButton asChild>
-                          <NavLink to={subItem.url}>
+                          <NavLink to={subItem.url} onClick={handleNavClick}>
                             <span>{subItem.title}</span>
                           </NavLink>
                         </SidebarMenuSubButton>

@@ -1,3 +1,5 @@
+"use client";
+
 import { useEffect, useState } from "react";
 import { format } from "date-fns";
 import { es } from "date-fns/locale";
@@ -29,7 +31,7 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
-import { FeedingProps } from "@/types";
+import type { FeedingProps } from "@/types";
 import { toast } from "react-toastify";
 import {
   AlertDialog,
@@ -51,6 +53,7 @@ import {
   updateFeeding,
 } from "@/services/FeedingService";
 import { Input } from "@/components/ui/input";
+import { useForm, Controller } from "react-hook-form";
 
 const feedingTypes = [
   "Croquetas / pienso seco",
@@ -58,7 +61,7 @@ const feedingTypes = [
   "Dieta BARF (cruda o cocida)",
   "Premios / snacks",
   "Comida casera cocida",
-  "Leche para cachorros / gatitos",
+  "Leche para cachorros",
   "Alimento especializado (renal, hipoalergénico, etc.)",
   "Suplementos alimenticios",
   "Frutas y verduras permitidas",
@@ -67,6 +70,13 @@ const feedingTypes = [
   "Agua fresca",
   "Otro",
 ];
+
+interface FeedingFormData {
+  type: string;
+  description: string;
+  quantity: number;
+  date: Date;
+}
 
 export default function ManageFeedingsPage() {
   const [feedings, setFeedings] = useState<FeedingProps[]>([]);
@@ -108,6 +118,21 @@ export default function ManageFeedingsPage() {
     date: new Date(),
   });
 
+  // React Hook Form setup
+  const {
+    control,
+    handleSubmit,
+    reset,
+    formState: { errors },
+  } = useForm<FeedingFormData>({
+    defaultValues: {
+      type: "",
+      description: "",
+      quantity: 1,
+      date: new Date(),
+    },
+  });
+
   // Función para abrir el formulario en modo añadir
   const handleAddNew = () => {
     setIsEditMode(false);
@@ -115,7 +140,13 @@ export default function ManageFeedingsPage() {
       id: 0,
       type: "",
       description: "",
-      quantity: 0,
+      quantity: 1,
+      date: new Date(),
+    });
+    reset({
+      type: "",
+      description: "",
+      quantity: 1,
       date: new Date(),
     });
     setIsOpen(true);
@@ -124,6 +155,12 @@ export default function ManageFeedingsPage() {
   const handleEdit = (f: FeedingProps) => {
     setIsEditMode(true);
     setCurrentRecord({ ...f });
+    reset({
+      type: f.type,
+      description: f.description,
+      quantity: f.quantity,
+      date: f.date,
+    });
     setIsOpen(true);
   };
 
@@ -141,27 +178,22 @@ export default function ManageFeedingsPage() {
     }
   };
 
-  const handleSave = async () => {
-    if (!currentRecord.type || !currentRecord.description) {
-      toast.error("Todos los campos son obligatorios.", {
-        autoClose: 2000,
-      });
-      return;
-    }
-
+  const onSubmit = async (data: FeedingFormData) => {
     try {
       if (isEditMode) {
         const result = await updateFeeding(
           currentRecord.id,
-          currentRecord.type,
-          currentRecord.description,
-          currentRecord.quantity,
-          format(currentRecord.date, "yyyy-MM-dd")
+          data.type,
+          data.description,
+          data.quantity,
+          format(data.date, "yyyy-MM-dd")
         );
         console.log("Id feeding", currentRecord.id);
         if (result?.success) {
           setFeedings(
-            feedings.map((f) => (f.id === currentRecord.id ? currentRecord : f))
+            feedings.map((f) =>
+              f.id === currentRecord.id ? { ...currentRecord, ...data } : f
+            )
           );
           toast.success("Historial alimentario actualizado correctamente.", {
             autoClose: 2000,
@@ -170,13 +202,13 @@ export default function ManageFeedingsPage() {
       } else {
         const result = await createNewFeeding(
           id,
-          currentRecord.type,
-          currentRecord.description,
-          currentRecord.quantity,
-          format(currentRecord.date, "yyyy-MM-dd")
+          data.type,
+          data.description,
+          data.quantity,
+          format(data.date, "yyyy-MM-dd")
         );
         if (result.success) {
-          setFeedings([...feedings, currentRecord]);
+          setFeedings([...feedings, { ...currentRecord, ...data }]);
           toast.success("Historial alimentario añadido correctamente.", {
             autoClose: 2000,
           });
@@ -195,8 +227,9 @@ export default function ManageFeedingsPage() {
       </h2>
       {id === undefined && name === undefined ? (
         <p className="text-center py-10 text-muted-foreground">
-          No hay mascotas registradas para este usuario.<br/> Por favor, añade una
-          mascota para comenzar a gestionar su historial.
+          No hay mascotas registradas para este usuario.
+          <br /> Por favor, añade una mascota para comenzar a gestionar su
+          historial.
         </p>
       ) : (
         <>
@@ -220,79 +253,154 @@ export default function ManageFeedingsPage() {
                     mascota.
                   </DialogDescription>
                 </DialogHeader>
-                <div className="grid gap-4 py-4">
+                <form
+                  onSubmit={handleSubmit(onSubmit)}
+                  className="grid gap-4 py-4"
+                >
                   <div className="grid gap-2">
                     <Label htmlFor="type">Tipo</Label>
-                    <Select
-                      value={currentRecord.type}
-                      onValueChange={(value) =>
-                        setCurrentRecord({ ...currentRecord, type: value })
-                      }
-                    >
-                      <SelectTrigger id="type">
-                        <SelectValue placeholder="Seleccione un tipo" />
-                      </SelectTrigger>
-                      <SelectContent>
-                        {feedingTypes.map((type) => (
-                          <SelectItem
-                            key={type}
-                            value={type}
-                            className="cursor-pointer"
-                          >
-                            {type}
-                          </SelectItem>
-                        ))}
-                      </SelectContent>
-                    </Select>
+                    <Controller
+                      control={control}
+                      name="type"
+                      rules={{
+                        required: "El tipo de alimentación es requerido",
+                      }}
+                      render={({ field }) => (
+                        <Select
+                          onValueChange={field.onChange}
+                          value={field.value}
+                        >
+                          <SelectTrigger id="type">
+                            <SelectValue placeholder="Seleccione un tipo" />
+                          </SelectTrigger>
+                          <SelectContent>
+                            {feedingTypes.map((type) => (
+                              <SelectItem
+                                key={type}
+                                value={type}
+                                className="cursor-pointer"
+                              >
+                                {type}
+                              </SelectItem>
+                            ))}
+                          </SelectContent>
+                        </Select>
+                      )}
+                    />
+                    {errors.type && (
+                      <span className="text-red-500 text-sm">
+                        {errors.type.message}
+                      </span>
+                    )}
                   </div>
+
                   <div className="grid gap-2">
                     <Label htmlFor="description">Descripción</Label>
-                    <Textarea
-                      id="description"
-                      value={currentRecord.description}
-                      onChange={(e) =>
-                        setCurrentRecord({
-                          ...currentRecord,
-                          description: e.target.value,
-                        })
-                      }
-                      placeholder="Detalle la alimentación suministrada"
+                    <Controller
+                      control={control}
+                      name="description"
+                      rules={{
+                        required: "La descripción es requerida",
+                        minLength: {
+                          value: 3,
+                          message:
+                            "La descripción debe tener al menos 3 caracteres",
+                        },
+                        maxLength: {
+                          value: 500,
+                          message:
+                            "La descripción no puede exceder 500 caracteres",
+                        },
+                      }}
+                      render={({ field }) => (
+                        <Textarea
+                          id="description"
+                          {...field}
+                          placeholder="Detalle la alimentación suministrada"
+                          maxLength={500}
+                        />
+                      )}
                     />
+                    {errors.description && (
+                      <span className="text-red-500 text-sm">
+                        {errors.description.message}
+                      </span>
+                    )}
                   </div>
+
                   <div className="grid gap-2">
-                    <Label htmlFor="description">Cantidad {"(gramos)"}</Label>
-                    <Input
-                      type="number"
-                      min={1}
-                      placeholder="Ej. 100 g"
-                      value={currentRecord.quantity}
-                      onChange={(e) =>
-                        setCurrentRecord({
-                          ...currentRecord,
-                          quantity: +e.target.value,
-                        })
-                      }
+                    <Label htmlFor="quantity">Cantidad {"(gramos)"}</Label>
+                    <Controller
+                      control={control}
+                      name="quantity"
+                      rules={{
+                        required: "La cantidad es requerida",
+                        min: {
+                          value: 1,
+                          message: "La cantidad debe ser al menos 1 gramo",
+                        },
+                        max: {
+                          value: 500,
+                          message: "La cantidad no puede exceder 500 gramos",
+                        },
+                      }}
+                      render={({ field }) => (
+                        <Input
+                          type="number"
+                          id="quantity"
+                          min={1}
+                          max={10000}
+                          placeholder="Ej. 100 g"
+                          {...field}
+                          onChange={(e) =>
+                            field.onChange(Number(e.target.value))
+                          }
+                        />
+                      )}
                     />
+                    {errors.quantity && (
+                      <span className="text-red-500 text-sm">
+                        {errors.quantity.message}
+                      </span>
+                    )}
                   </div>
+
                   <div className="grid gap-2">
                     <Label htmlFor="date">Fecha</Label>
-                    <DatePicker
-                      selected={currentRecord.date}
-                      onChange={(date: Date) =>
-                        setCurrentRecord({
-                          ...currentRecord,
-                          date: date || new Date(),
-                        })
-                      }
+                    <Controller
+                      control={control}
+                      name="date"
+                      rules={{ required: "La fecha es requerida" }}
+                      render={({ field }) => (
+                        <DatePicker
+                          selected={field.value}
+                          onChange={(date: Date | undefined) =>
+                            field.onChange(date || new Date())
+                          }
+                        />
+                      )}
                     />
+                    {errors.date && (
+                      <span className="text-red-500 text-sm">
+                        {errors.date.message}
+                      </span>
+                    )}
                   </div>
-                </div>
-                <DialogFooter>
-                  <Button variant="outline" onClick={() => setIsOpen(false)}>
-                    Cancelar
-                  </Button>
-                  <Button onClick={handleSave}>Guardar</Button>
-                </DialogFooter>
+
+                  <DialogFooter className="flex flex-col gap-3 md:flex-row md:gap-1 md:justify-end">
+                    <Button
+                      type="button"
+                      variant="outline"
+                      onClick={() => setIsOpen(false)}
+                      className="w-full md:w-auto"
+                    >
+                      Cancelar
+                    </Button>
+                    <Button type="submit" className="w-full md:w-auto">
+                      Guardar
+                    </Button>
+                  </DialogFooter>
+                </form>
               </DialogContent>
             </Dialog>
           </div>

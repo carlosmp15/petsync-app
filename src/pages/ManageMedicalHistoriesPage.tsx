@@ -1,3 +1,5 @@
+"use client";
+
 import {
   createNewMedicalHistory,
   deleteMedicalHistory,
@@ -35,7 +37,7 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
-import { MedicalHistoryProps } from "@/types";
+import type { MedicalHistoryProps } from "@/types";
 import { toast } from "react-toastify";
 import {
   AlertDialog,
@@ -50,6 +52,7 @@ import {
 } from "@/components/ui/alert-dialog";
 import { DatePicker } from "@/components/ui/date-picker";
 import { useSelectedPetStore } from "@/stores/selectedPetStore";
+import { useForm, Controller } from "react-hook-form";
 
 const medicalTypes = [
   "Vacunación",
@@ -60,6 +63,12 @@ const medicalTypes = [
   "Tratamiento",
   "Otro",
 ];
+
+interface MedicalHistoryFormData {
+  type: string;
+  description: string;
+  date: Date;
+}
 
 export default function ManageMedicalHistoriesPage() {
   const [medicalHistories, setMedicalHistories] = useState<
@@ -102,11 +111,30 @@ export default function ManageMedicalHistoriesPage() {
     date: new Date(),
   });
 
+  // React Hook Form setup
+  const {
+    control,
+    handleSubmit,
+    reset,
+    formState: { errors },
+  } = useForm<MedicalHistoryFormData>({
+    defaultValues: {
+      type: "",
+      description: "",
+      date: new Date(),
+    },
+  });
+
   // Función para abrir el formulario en modo añadir
   const handleAddNew = () => {
     setIsEditMode(false);
     setCurrentRecord({
       id: 0,
+      type: "",
+      description: "",
+      date: new Date(),
+    });
+    reset({
       type: "",
       description: "",
       date: new Date(),
@@ -117,6 +145,11 @@ export default function ManageMedicalHistoriesPage() {
   const handleEdit = (ms: MedicalHistoryProps) => {
     setIsEditMode(true);
     setCurrentRecord({ ...ms });
+    reset({
+      type: ms.type,
+      description: ms.description,
+      date: ms.date,
+    });
     setIsOpen(true);
   };
 
@@ -134,26 +167,19 @@ export default function ManageMedicalHistoriesPage() {
     }
   };
 
-  const handleSave = async () => {
-    if (!currentRecord.type || !currentRecord.description) {
-      toast.error("Todos los campos son obligatorios.", {
-        autoClose: 2000,
-      });
-      return;
-    }
-
+  const onSubmit = async (data: MedicalHistoryFormData) => {
     try {
       if (isEditMode) {
         const result = await updateMedicalHistory(
           currentRecord.id,
-          currentRecord.type,
-          currentRecord.description,
-          format(currentRecord.date, "yyyy-MM-dd")
+          data.type,
+          data.description,
+          format(data.date, "yyyy-MM-dd")
         );
         if (result?.success) {
           setMedicalHistories(
             medicalHistories.map((ms) =>
-              ms.id === currentRecord.id ? currentRecord : ms
+              ms.id === currentRecord.id ? { ...currentRecord, ...data } : ms
             )
           );
           toast.success("Historial médico actualizado correctamente.", {
@@ -163,12 +189,15 @@ export default function ManageMedicalHistoriesPage() {
       } else {
         const result = await createNewMedicalHistory(
           id,
-          currentRecord.type,
-          currentRecord.description,
-          format(currentRecord.date, "yyyy-MM-dd")
+          data.type,
+          data.description,
+          format(data.date, "yyyy-MM-dd")
         );
         if (result.success) {
-          setMedicalHistories([...medicalHistories, currentRecord]);
+          setMedicalHistories([
+            ...medicalHistories,
+            { ...currentRecord, ...data },
+          ]);
           toast.success("Historial médico añadido correctamente.", {
             autoClose: 2000,
           });
@@ -212,64 +241,118 @@ export default function ManageMedicalHistoriesPage() {
                     Complete los detalles del historial médico de su mascota.
                   </DialogDescription>
                 </DialogHeader>
-                <div className="grid gap-4 py-4">
+                <form
+                  onSubmit={handleSubmit(onSubmit)}
+                  className="grid gap-4 py-4"
+                >
                   <div className="grid gap-2">
                     <Label htmlFor="type">Tipo</Label>
-                    <Select
-                      value={currentRecord.type}
-                      onValueChange={(value) =>
-                        setCurrentRecord({ ...currentRecord, type: value })
-                      }
-                    >
-                      <SelectTrigger id="type">
-                        <SelectValue placeholder="Seleccione un tipo" />
-                      </SelectTrigger>
-                      <SelectContent>
-                        {medicalTypes.map((type) => (
-                          <SelectItem
-                            key={type}
-                            value={type}
-                            className="cursor-pointer"
-                          >
-                            {type}
-                          </SelectItem>
-                        ))}
-                      </SelectContent>
-                    </Select>
+                    <Controller
+                      control={control}
+                      name="type"
+                      rules={{
+                        required: "El tipo de historial médico es requerido",
+                      }}
+                      render={({ field }) => (
+                        <Select
+                          onValueChange={field.onChange}
+                          value={field.value}
+                        >
+                          <SelectTrigger id="type">
+                            <SelectValue placeholder="Seleccione un tipo" />
+                          </SelectTrigger>
+                          <SelectContent>
+                            {medicalTypes.map((type) => (
+                              <SelectItem
+                                key={type}
+                                value={type}
+                                className="cursor-pointer"
+                              >
+                                {type}
+                              </SelectItem>
+                            ))}
+                          </SelectContent>
+                        </Select>
+                      )}
+                    />
+                    {errors.type && (
+                      <span className="text-red-500 text-sm">
+                        {errors.type.message}
+                      </span>
+                    )}
                   </div>
+
                   <div className="grid gap-2">
                     <Label htmlFor="description">Descripción</Label>
-                    <Textarea
-                      id="description"
-                      value={currentRecord.description}
-                      onChange={(e) =>
-                        setCurrentRecord({
-                          ...currentRecord,
-                          description: e.target.value,
-                        })
-                      }
-                      placeholder="Describa el procedimiento o tratamiento"
+                    <Controller
+                      control={control}
+                      name="description"
+                      rules={{
+                        required: "La descripción es requerida",
+                        minLength: {
+                          value: 5,
+                          message:
+                            "La descripción debe tener al menos 5 caracteres",
+                        },
+                        maxLength: {
+                          value: 1000,
+                          message:
+                            "La descripción no puede exceder 1000 caracteres",
+                        },
+                      }}
+                      render={({ field }) => (
+                        <Textarea
+                          id="description"
+                          {...field}
+                          placeholder="Describa el procedimiento o tratamiento"
+                          maxLength={1000}
+                          rows={4}
+                        />
+                      )}
                     />
+                    {errors.description && (
+                      <span className="text-red-500 text-sm">
+                        {errors.description.message}
+                      </span>
+                    )}
                   </div>
+
                   <div className="grid gap-2">
                     <Label htmlFor="date">Fecha</Label>
-                    <DatePicker
-                      selected={currentRecord.date}
-                      onChange={(date: Date) =>
-                        setCurrentRecord({
-                          ...currentRecord,
-                          date: date || new Date(),
-                        })
-                      }
+                    <Controller
+                      control={control}
+                      name="date"
+                      rules={{ required: "La fecha es requerida" }}
+                      render={({ field }) => (
+                        <DatePicker
+                          selected={field.value}
+                          onChange={(date: Date | undefined) =>
+                            field.onChange(date || new Date())
+                          }
+                        />
+                      )}
                     />
+                    {errors.date && (
+                      <span className="text-red-500 text-sm">
+                        {errors.date.message}
+                      </span>
+                    )}
                   </div>
-                </div>
-                <DialogFooter>
-                  <Button variant="outline" onClick={() => setIsOpen(false)}>
-                    Cancelar
-                  </Button>
-                  <Button onClick={handleSave}>Guardar</Button>
-                </DialogFooter>
+
+                  <DialogFooter className="flex flex-col gap-3 md:flex-row md:gap-1 md:justify-end">
+                    <Button
+                      type="button"
+                      variant="outline"
+                      onClick={() => setIsOpen(false)}
+                      className="w-full md:w-auto"
+                    >
+                      Cancelar
+                    </Button>
+                    <Button type="submit" className="w-full md:w-auto">
+                      Guardar
+                    </Button>
+                  </DialogFooter>
+                </form>
               </DialogContent>
             </Dialog>
           </div>

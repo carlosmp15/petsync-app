@@ -3,7 +3,6 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/com
 import { Badge } from "@/components/ui/badge"
 import {
   Heart,
-  Calendar,
   Activity,
   Users,
   Shield,
@@ -65,6 +64,15 @@ export default function LandingPage() {
     "Múltiples perfiles de mascotas",
     "Interfaz intuitiva y fácil de usar",
   ]
+  const user = localStorage.getItem("user")
+
+  const redirectPage = (url: string) => {
+    if (!user) {
+      navigate(url)
+    } else {
+      navigate("/home")
+    }
+  }
 
   return (
     <div className="min-h-screen bg-gradient-to-b from-blue-50 to-white">
@@ -77,10 +85,10 @@ export default function LandingPage() {
               <span className="text-2xl font-bold text-primary">PetSync</span>
             </div>
             <div className="flex items-center gap-4">
-              <Button variant="outline" onClick={() => navigate("/account/login")} className="hidden sm:inline-flex">
+              <Button variant="outline" onClick={() => redirectPage("/account/login")} className="hidden sm:inline-flex">
                 Iniciar Sesión
               </Button>
-              <Button onClick={() => navigate("/account/register")}>Registrarse</Button>
+              <Button onClick={() => redirectPage("/account/register")}>Registrarse</Button>
             </div>
           </div>
         </div>
@@ -106,7 +114,7 @@ export default function LandingPage() {
               </div>
 
               <div className="flex flex-col sm:flex-row gap-4">
-                <Button size="lg" onClick={() => navigate("/account/register")} className="text-lg px-8 py-6">
+                <Button size="lg" onClick={() => redirectPage("/account/register")} className="text-lg px-8 py-6">
                   Comenzar Gratis
                   <ArrowRight className="ml-2 h-5 w-5" />
                 </Button>

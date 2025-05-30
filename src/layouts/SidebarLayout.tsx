@@ -12,6 +12,7 @@ import { usePetUserStore } from "@/stores/petUserStore";
 import { ToastContainer } from "react-toastify";
 import { Separator } from "@/components/ui/separator";
 import { Menu } from "lucide-react";
+import { NavLink } from "react-router-dom";
 
 export default function SidebarLayout() {
   const { pets, setPets } = usePetUserStore();
@@ -39,15 +40,17 @@ export default function SidebarLayout() {
         {/* Header con trigger para móvil */}
         <header className="flex h-16 shrink-0 items-center gap-2 border-b px-4">
           {/* Mostrar trigger solo en móviles */}
-          <SidebarTrigger className="-ml-1 lg:hidden">
+          <SidebarTrigger className="-ml-1">
             <Menu className="h-4 w-4" />
             <span className="sr-only">Abrir menú</span>
           </SidebarTrigger>
 
-          <Separator orientation="vertical" className="mr-2 h-4 lg:hidden" />
+          <Separator orientation="vertical" className="mr-2 h-4" />
 
           <div className="flex flex-1 items-center gap-2">
-            <h1 className="text-lg font-semibold">PetSync</h1>
+            <NavLink to={"/"} className="flex items-center gap-2" end>
+              <h1 className="text-lg font-semibold">PetSync</h1>
+            </NavLink>
           </div>
         </header>
 
