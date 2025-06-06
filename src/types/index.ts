@@ -89,8 +89,3 @@ export type FeedingProps = {
 export type BreedsData = {
   [breed: string]: string[]
 }
-
-export type ComboboxOption = {
-  value: string
-  label: string
-}

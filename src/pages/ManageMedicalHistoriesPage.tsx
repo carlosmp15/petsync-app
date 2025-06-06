@@ -1,5 +1,3 @@
-"use client";
-
 import {
   createNewMedicalHistory,
   deleteMedicalHistory,
@@ -362,78 +360,152 @@ export default function ManageMedicalHistoriesPage() {
               No hay historiales médicos registrados.
             </div>
           ) : (
-            <div className="border rounded-md">
-              <Table>
-                <TableHeader>
-                  <TableRow>
-                    <TableHead>Tipo</TableHead>
-                    <TableHead>Descripción</TableHead>
-                    <TableHead>Fecha</TableHead>
-                    <TableHead className="text-right">Acciones</TableHead>
-                  </TableRow>
-                </TableHeader>
-                <TableBody>
-                  {medicalHistories.map((ms) => (
-                    <TableRow key={ms.id}>
-                      <TableCell className="font-medium">{ms.type}</TableCell>
-                      <TableCell>{ms.description}</TableCell>
-                      <TableCell>
-                        {format(ms.date, "dd/MM/yyyy", { locale: es })}
-                      </TableCell>
-                      <TableCell className="text-right">
-                        <div className="flex justify-end gap-2">
-                          <Button
-                            variant="ghost"
-                            size="icon"
-                            onClick={() => handleEdit(ms)}
-                          >
-                            <Pencil className="h-4 w-4" />
-                            <span className="sr-only">Editar</span>
-                          </Button>
-                          <AlertDialog>
-                            <AlertDialogTrigger asChild>
-                              <Button
-                                variant="ghost"
-                                size="icon"
-                                onClick={() => setSelectedToDelete(ms.id)}
+            <>
+              {/* Cards para pantallas pequeñas */}
+              <div className="sm:hidden grid gap-4 mb-6">
+                {medicalHistories.map((ms) => (
+                  <div
+                    key={ms.id}
+                    className="border rounded-md p-4 shadow-sm bg-white"
+                  >
+                    <div className="flex justify-between items-start">
+                      <h3 className="font-semibold text-lg">{ms.type}</h3>
+                      <div className="flex gap-2">
+                        <Button
+                          variant="ghost"
+                          size="icon"
+                          onClick={() => handleEdit(ms)}
+                          aria-label="Editar"
+                        >
+                          <Pencil className="h-4 w-4" />
+                        </Button>
+                        <AlertDialog>
+                          <AlertDialogTrigger asChild>
+                            <Button
+                              variant="ghost"
+                              size="icon"
+                              onClick={() => setSelectedToDelete(ms.id)}
+                              aria-label="Eliminar"
+                            >
+                              <Trash2 className="h-4 w-4 text-red-600" />
+                            </Button>
+                          </AlertDialogTrigger>
+                          <AlertDialogContent>
+                            <AlertDialogHeader>
+                              <AlertDialogTitle>
+                                Eliminación de historial médico
+                              </AlertDialogTitle>
+                              <AlertDialogDescription>
+                                Esta acción eliminará el historial médico
+                                permanentemente. ¿Deseas continuar?
+                              </AlertDialogDescription>
+                            </AlertDialogHeader>
+                            <AlertDialogFooter>
+                              <AlertDialogCancel>Cancelar</AlertDialogCancel>
+                              <AlertDialogAction
+                                className="bg-red-800 hover:bg-red-700"
+                                onClick={() => {
+                                  if (selectedToDelete !== null) {
+                                    handleDelete(selectedToDelete);
+                                    setSelectedToDelete(null);
+                                  }
+                                }}
                               >
-                                <Trash2 className="h-4 w-4" />
-                                <span className="sr-only">Eliminar</span>
-                              </Button>
-                            </AlertDialogTrigger>
-                            <AlertDialogContent>
-                              <AlertDialogHeader>
-                                <AlertDialogTitle>
-                                  Eliminación de historial médico
-                                </AlertDialogTitle>
-                                <AlertDialogDescription>
-                                  Esta acción eliminará el historial médico
-                                  permanentemente. ¿Deseas continuar?
-                                </AlertDialogDescription>
-                              </AlertDialogHeader>
-                              <AlertDialogFooter>
-                                <AlertDialogCancel>Cancelar</AlertDialogCancel>
-                                <AlertDialogAction
-                                  className="bg-red-800 hover:bg-red-700"
-                                  onClick={() => {
-                                    if (selectedToDelete !== null) {
-                                      handleDelete(selectedToDelete);
-                                      setSelectedToDelete(null);
-                                    }
-                                  }}
-                                >
-                                  Eliminar
-                                </AlertDialogAction>
-                              </AlertDialogFooter>
-                            </AlertDialogContent>
-                          </AlertDialog>
-                        </div>
-                      </TableCell>
+                                Eliminar
+                              </AlertDialogAction>
+                            </AlertDialogFooter>
+                          </AlertDialogContent>
+                        </AlertDialog>
+                      </div>
+                    </div>
+
+                    <p>
+                      <strong>Descripción:</strong> {ms.description}
+                    </p>
+                    <p>
+                      <strong>Fecha:</strong>{" "}
+                      {format(ms.date, "dd/MM/yyyy", { locale: es })}
+                    </p>
+                  </div>
+                ))}
+              </div>
+
+              {/* Tabla para pantallas medianas y grandes */}
+              <div className="hidden sm:block border rounded-md">
+                <Table>
+                  <TableHeader>
+                    <TableRow>
+                      <TableHead>Tipo</TableHead>
+                      <TableHead>Descripción</TableHead>
+                      <TableHead>Fecha</TableHead>
+                      <TableHead className="text-right">Acciones</TableHead>
                     </TableRow>
-                  ))}
-                </TableBody>
-              </Table>
-            </div>
+                  </TableHeader>
+                  <TableBody>
+                    {medicalHistories.map((ms) => (
+                      <TableRow key={ms.id}>
+                        <TableCell className="font-medium">{ms.type}</TableCell>
+                        <TableCell>{ms.description}</TableCell>
+                        <TableCell>
+                          {format(ms.date, "dd/MM/yyyy", { locale: es })}
+                        </TableCell>
+                        <TableCell className="text-right">
+                          <div className="flex justify-end gap-2">
+                            <Button
+                              variant="ghost"
+                              size="icon"
+                              onClick={() => handleEdit(ms)}
+                            >
+                              <Pencil className="h-4 w-4" />
+                              <span className="sr-only">Editar</span>
+                            </Button>
+                            <AlertDialog>
+                              <AlertDialogTrigger asChild>
+                                <Button
+                                  variant="ghost"
+                                  size="icon"
+                                  onClick={() => setSelectedToDelete(ms.id)}
+                                >
+                                  <Trash2 className="h-4 w-4 text-red-600" />
+                                  <span className="sr-only">Eliminar</span>
+                                </Button>
+                              </AlertDialogTrigger>
+                              <AlertDialogContent>
+                                <AlertDialogHeader>
+                                  <AlertDialogTitle>
+                                    Eliminación de historial médico
+                                  </AlertDialogTitle>
+                                  <AlertDialogDescription>
+                                    Esta acción eliminará el historial médico
+                                    permanentemente. ¿Deseas continuar?
+                                  </AlertDialogDescription>
+                                </AlertDialogHeader>
+                                <AlertDialogFooter>
+                                  <AlertDialogCancel>
+                                    Cancelar
+                                  </AlertDialogCancel>
+                                  <AlertDialogAction
+                                    className="bg-red-800 hover:bg-red-700"
+                                    onClick={() => {
+                                      if (selectedToDelete !== null) {
+                                        handleDelete(selectedToDelete);
+                                        setSelectedToDelete(null);
+                                      }
+                                    }}
+                                  >
+                                    Eliminar
+                                  </AlertDialogAction>
+                                </AlertDialogFooter>
+                              </AlertDialogContent>
+                            </AlertDialog>
+                          </div>
+                        </TableCell>
+                      </TableRow>
+                    ))}
+                  </TableBody>
+                </Table>
+              </div>
+            </>
           )}
         </>
       )}

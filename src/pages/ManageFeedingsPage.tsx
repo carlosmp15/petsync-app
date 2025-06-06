@@ -1,5 +1,3 @@
-"use client";
-
 import { useEffect, useState } from "react";
 import { format } from "date-fns";
 import { es } from "date-fns/locale";
@@ -188,7 +186,6 @@ export default function ManageFeedingsPage() {
           data.quantity,
           format(data.date, "yyyy-MM-dd")
         );
-        console.log("Id feeding", currentRecord.id);
         if (result?.success) {
           setFeedings(
             feedings.map((f) =>
@@ -348,8 +345,6 @@ export default function ManageFeedingsPage() {
                         <Input
                           type="number"
                           id="quantity"
-                          min={1}
-                          max={10000}
                           placeholder="Ej. 100 g"
                           {...field}
                           onChange={(e) =>
@@ -387,17 +382,9 @@ export default function ManageFeedingsPage() {
                     )}
                   </div>
 
-                  <DialogFooter className="flex flex-col gap-3 md:flex-row md:gap-1 md:justify-end">
-                    <Button
-                      type="button"
-                      variant="outline"
-                      onClick={() => setIsOpen(false)}
-                      className="w-full md:w-auto"
-                    >
-                      Cancelar
-                    </Button>
-                    <Button type="submit" className="w-full md:w-auto">
-                      Guardar
+                  <DialogFooter>
+                    <Button type="submit" className="w-full sm:w-auto">
+                      {isEditMode ? "Guardar cambios" : "Añadir historial"}
                     </Button>
                   </DialogFooter>
                 </form>
@@ -405,43 +392,41 @@ export default function ManageFeedingsPage() {
             </Dialog>
           </div>
 
-          {feedings.length === 0 ? (
-            <div className="text-center py-10 text-muted-foreground">
-              No hay historiales alimentarios registrados.
-            </div>
-          ) : (
-            <div className="border rounded-md">
+          {/* Tabla para escritorio */}
+          <div className="hidden sm:block border rounded-md">
+            {feedings.length === 0 ? (
+              <div className="text-center py-10 text-muted-foreground">
+                No hay historiales alimentarios registrados.
+              </div>
+            ) : (
               <Table>
                 <TableHeader>
                   <TableRow>
                     <TableHead>Tipo</TableHead>
                     <TableHead>Descripción</TableHead>
-                    <TableHead>Cantidad</TableHead>
+                    <TableHead>Cantidad (gramos)</TableHead>
                     <TableHead>Fecha</TableHead>
-                    <TableHead className="text-right">Acciones</TableHead>
+                    <TableHead>Acciones</TableHead>
                   </TableRow>
                 </TableHeader>
                 <TableBody>
                   {feedings.map((ms) => (
                     <TableRow key={ms.id}>
-                      <TableCell className="font-medium">{ms.type}</TableCell>
+                      <TableCell>{ms.type}</TableCell>
                       <TableCell>{ms.description}</TableCell>
-                      <TableCell>
-                        {ms.quantity}
-                        {" gramos"}
-                      </TableCell>
+                      <TableCell>{ms.quantity}</TableCell>
                       <TableCell>
                         {format(ms.date, "dd/MM/yyyy", { locale: es })}
                       </TableCell>
-                      <TableCell className="text-right">
-                        <div className="flex justify-end gap-2">
+                      <TableCell>
+                        <div className="flex gap-2">
                           <Button
                             variant="ghost"
                             size="icon"
                             onClick={() => handleEdit(ms)}
+                            aria-label="Editar"
                           >
                             <Pencil className="h-4 w-4" />
-                            <span className="sr-only">Editar</span>
                           </Button>
                           <AlertDialog>
                             <AlertDialogTrigger asChild>
@@ -449,9 +434,9 @@ export default function ManageFeedingsPage() {
                                 variant="ghost"
                                 size="icon"
                                 onClick={() => setSelectedToDelete(ms.id)}
+                                aria-label="Eliminar"
                               >
-                                <Trash2 className="h-4 w-4" />
-                                <span className="sr-only">Eliminar</span>
+                                <Trash2 className="h-4 w-4 text-red-600" />
                               </Button>
                             </AlertDialogTrigger>
                             <AlertDialogContent>
@@ -486,8 +471,86 @@ export default function ManageFeedingsPage() {
                   ))}
                 </TableBody>
               </Table>
-            </div>
-          )}
+            )}
+          </div>
+
+          {/* Cards para móvil */}
+          <div className="grid gap-4 sm:hidden">
+            {feedings.length === 0 ? (
+              <div className="text-center py-10 text-muted-foreground">
+                No hay historiales alimentarios registrados.
+              </div>
+            ) : (
+              feedings.map((ms) => (
+                <div
+                  key={ms.id}
+                  className="border rounded-md p-4 shadow-sm bg-white"
+                >
+                  <div className="flex justify-between items-start">
+                    <h3 className="font-semibold text-lg">{ms.type}</h3>
+                    <div className="flex gap-2">
+                      <Button
+                        variant="ghost"
+                        size="icon"
+                        onClick={() => handleEdit(ms)}
+                        aria-label="Editar"
+                      >
+                        <Pencil className="h-4 w-4" />
+                      </Button>
+                      <AlertDialog>
+                        <AlertDialogTrigger asChild>
+                          <Button
+                            variant="ghost"
+                            size="icon"
+                            onClick={() => setSelectedToDelete(ms.id)}
+                            aria-label="Eliminar"
+                          >
+                            <Trash2 className="h-4 w-4 text-red-600" />
+                          </Button>
+                        </AlertDialogTrigger>
+                        <AlertDialogContent>
+                          <AlertDialogHeader>
+                            <AlertDialogTitle>
+                              Eliminación de historial alimentario
+                            </AlertDialogTitle>
+                            <AlertDialogDescription>
+                              Esta acción eliminará el historial alimentario
+                              permanentemente. ¿Deseas continuar?
+                            </AlertDialogDescription>
+                          </AlertDialogHeader>
+                          <AlertDialogFooter>
+                            <AlertDialogCancel>Cancelar</AlertDialogCancel>
+                            <AlertDialogAction
+                              className="bg-red-800 hover:bg-red-700"
+                              onClick={() => {
+                                if (selectedToDelete !== null) {
+                                  handleDelete(selectedToDelete);
+                                  setSelectedToDelete(null);
+                                }
+                              }}
+                            >
+                              Eliminar
+                            </AlertDialogAction>
+                          </AlertDialogFooter>
+                        </AlertDialogContent>
+                      </AlertDialog>
+                    </div>
+                  </div>
+
+                  <p>
+                    <strong>Descripción:</strong> {ms.description}
+                  </p>
+                  <p>
+                    <strong>Cantidad:</strong> {ms.quantity} gramos
+                  </p>
+                  <p>
+                    <strong>Fecha:</strong>{" "}
+                    {format(ms.date, "dd/MM/yyyy", { locale: es })}
+                  </p>
+                </div>
+              ))
+            )}
+          </div>
         </>
       )}
     </div>

@@ -80,15 +80,15 @@ export async function getFilteredBreeds(searchTerm: string) {
       const data: BreedsData = response.data.message
       const allBreeds: string[] = [];
           
-      Object.entries(data).forEach(([breed, subBreeds]) => {
-        if (subBreeds.length === 0) {
-          allBreeds.push(breed); // solo raza
-        } else {
-          subBreeds.forEach(sub => {
-            allBreeds.push(`${breed} ${sub}`);
-          });
-        }
-      });
+    Object.entries(data).forEach(([breed, subBreeds]) => {
+      if (subBreeds.length === 0) {
+        allBreeds.push(breed); // solo raza
+      } else {
+        subBreeds.forEach(sub => {
+          allBreeds.push(`${breed} ${sub}`);
+        });
+      }
+    });
 
       const lowerTerm = searchTerm.toLowerCase();
       return allBreeds.filter(breed => breed.toLowerCase().includes(lowerTerm));
@@ -101,35 +101,6 @@ export async function getFilteredBreeds(searchTerm: string) {
     return [];
   }
 }
-
-// export async function getFilteredBreeds() {
-//   try {
-//     const url = `${import.meta.env.VITE_PET_API_URL}/breeds/list/all`;
-//     const response = await axios.get(url);
-
-//     if (response.status === 200) {
-//       const data: BreedsData = response.data.message
-//       const allBreeds: string[] = [];
-          
-//     Object.entries(data).forEach(([breed, subBreeds]) => {
-//       if (subBreeds.length === 0) {
-//         allBreeds.push(breed); // solo raza
-//       } else {
-//         subBreeds.forEach(sub => {
-//           allBreeds.push(`${breed} ${sub}`);
-//         });
-//       }
-//     });
-//     return allBreeds;
-//     } else {
-//       console.error('Error al obtener las razas');
-//       return [];
-//     }
-//   } catch (error) {
-//     console.error('Error en la petición:', error);
-//     return [];
-//   }
-// }
 
 
 // Función que obtiene todas las mascotas de un usuario por id

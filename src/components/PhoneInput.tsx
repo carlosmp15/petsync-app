@@ -22,7 +22,7 @@ const PhoneInput = React.forwardRef<HTMLInputElement, PhoneInputProps>(
     const InputWithRef = React.useMemo(
       () =>
         React.forwardRef<HTMLInputElement, React.ComponentProps<"input">>((inputProps, inputRef) => (
-          <InputComponent {...inputProps} ref={ref || inputRef} />
+          <InputComponent {...inputProps} ref={inputRef} />
         )),
       [ref],
     )

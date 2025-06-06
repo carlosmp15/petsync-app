@@ -1,5 +1,3 @@
-"use client";
-
 import { useEffect, useState } from "react";
 import { format } from "date-fns";
 import { es } from "date-fns/locale";
@@ -80,59 +78,47 @@ export default function ManageDailyActivitiesPage() {
   const [selectedToDelete, setSelectedToDelete] = useState<number | null>(null);
   const { id, name } = useSelectedPetStore();
 
-  const fetchMedicalHistories = async () => {
+  const fetchDailyActivities = async () => {
     try {
       const result = await getAllDailyActivityByPetId(id);
-
       if (result?.success) {
         setDailyActivities(result.data);
       } else {
         setDailyActivities([]);
       }
-    } catch (error) {
+    } catch {
       setDailyActivities([]);
     }
   };
 
   useEffect(() => {
-    fetchMedicalHistories();
-  }, []);
-
-  useEffect(() => {
-    if (id !== undefined) {
-      fetchMedicalHistories();
-    }
+    if (id !== undefined) fetchDailyActivities();
   }, [id]);
 
-  // Estado para el formulario
   const [isOpen, setIsOpen] = useState(false);
   const [isEditMode, setIsEditMode] = useState(false);
   const [currentRecord, setCurrentRecord] = useState<DailyActivityProps>({
     id: 0,
     type: "",
-    duration: 0,
+    duration: 1,
     notes: "",
     date: new Date(),
   });
 
-  // React Hook Form setup
   const {
     control,
     handleSubmit,
     reset,
     formState: { errors },
-    setValue,
-    watch,
   } = useForm<ActivityFormData>({
     defaultValues: {
       type: "",
-      duration: undefined,
+      duration: 1,
       notes: "",
       date: new Date(),
     },
   });
 
-  // Función para abrir el formulario en modo añadir
   const handleAddNew = () => {
     setIsEditMode(false);
     setCurrentRecord({
@@ -172,7 +158,7 @@ export default function ManageDailyActivitiesPage() {
           autoClose: 2000,
         });
       }
-    } catch (error) {
+    } catch {
       toast.error("Error inesperado al eliminar una actividad diaria.");
     }
   };
@@ -187,7 +173,6 @@ export default function ManageDailyActivitiesPage() {
           data.notes,
           format(data.date, "yyyy-MM-dd")
         );
-        console.log(result);
         if (result?.success) {
           setDailyActivities(
             dailyActivities.map((da) =>
@@ -206,7 +191,7 @@ export default function ManageDailyActivitiesPage() {
           data.notes,
           format(data.date, "yyyy-MM-dd")
         );
-        if (result.success) {
+        if (result?.success) {
           setDailyActivities([
             ...dailyActivities,
             { ...currentRecord, ...data },
@@ -216,10 +201,9 @@ export default function ManageDailyActivitiesPage() {
           });
         }
       }
-
       setIsOpen(false);
-    } catch (error) {
-      toast.error("Error al guardar el historial médico.");
+    } catch {
+      toast.error("Error al guardar la actividad diaria.");
     }
   };
 
@@ -231,8 +215,8 @@ export default function ManageDailyActivitiesPage() {
       {id === undefined && name === undefined ? (
         <p className="text-center py-10 text-muted-foreground">
           No hay mascotas registradas para este usuario.
-          <br /> Por favor, añade una mascota para comenzar a gestionar su
-          historial.
+          <br />
+          Por favor, añade una mascota para comenzar a gestionar su historial.
         </p>
       ) : (
         <>
@@ -252,7 +236,7 @@ export default function ManageDailyActivitiesPage() {
                       : "Añadir actividad diaria"}
                   </DialogTitle>
                   <DialogDescription>
-                    Complete los detalles del historial médico de su mascota.
+                    Complete los detalles de la actividad diaria de su mascota.
                   </DialogDescription>
                 </DialogHeader>
                 <form
@@ -295,7 +279,7 @@ export default function ManageDailyActivitiesPage() {
                   </div>
 
                   <div className="grid gap-2">
-                    <Label htmlFor="duration">Duración {"(min)"}</Label>
+                    <Label htmlFor="duration">Duración (min)</Label>
                     <Controller
                       control={control}
                       name="duration"
@@ -319,9 +303,9 @@ export default function ManageDailyActivitiesPage() {
                           placeholder="Ej. 30 min"
                           value={field.value ?? ""}
                           onChange={(e) => {
-                            const value = e.target.value;
+                            const val = e.target.value;
                             field.onChange(
-                              value === "" ? undefined : Number(value)
+                              val === "" ? undefined : Number(val)
                             );
                           }}
                         />
@@ -402,12 +386,13 @@ export default function ManageDailyActivitiesPage() {
             </Dialog>
           </div>
 
-          {dailyActivities.length === 0 ? (
-            <div className="text-center py-10 text-muted-foreground">
-              No hay actividades diarias registradas.
-            </div>
-          ) : (
-            <div className="border rounded-md">
+          {/* Tabla para escritorio */}
+          <div className="hidden sm:block border rounded-md">
+            {dailyActivities.length === 0 ? (
+              <div className="text-center py-10 text-muted-foreground">
+                No hay actividades diarias registradas.
+              </div>
+            ) : (
               <Table>
                 <TableHeader>
                   <TableRow>
@@ -422,10 +407,7 @@ export default function ManageDailyActivitiesPage() {
                   {dailyActivities.map((da) => (
                     <TableRow key={da.id}>
                       <TableCell className="font-medium">{da.type}</TableCell>
-                      <TableCell>
-                        {da.duration}
-                        {" minutos"}
-                      </TableCell>
+                      <TableCell>{da.duration} minutos</TableCell>
                       <TableCell>{da.notes}</TableCell>
                       <TableCell>
                         {format(da.date, "dd/MM/yyyy", { locale: es })}
@@ -436,41 +418,35 @@ export default function ManageDailyActivitiesPage() {
                             variant="ghost"
                             size="icon"
                             onClick={() => handleEdit(da)}
+                            aria-label="Editar"
                           >
                             <Pencil className="h-4 w-4" />
-                            <span className="sr-only">Editar</span>
                           </Button>
                           <AlertDialog>
                             <AlertDialogTrigger asChild>
                               <Button
                                 variant="ghost"
                                 size="icon"
-                                onClick={() => setSelectedToDelete(da.id)}
+                                aria-label="Eliminar"
                               >
-                                <Trash2 className="h-4 w-4" />
-                                <span className="sr-only">Eliminar</span>
+                                <Trash2 className="h-4 w-4 text-red-600" />
                               </Button>
                             </AlertDialogTrigger>
                             <AlertDialogContent>
                               <AlertDialogHeader>
                                 <AlertDialogTitle>
-                                  Eliminación de actividad diaria
+                                  ¿Eliminar actividad diaria?
                                 </AlertDialogTitle>
                                 <AlertDialogDescription>
-                                  Esta acción eliminará la actividad diaria
-                                  permanentemente. ¿Deseas continuar?
+                                  Esta acción no se puede deshacer. ¿Está seguro
+                                  de eliminar esta actividad?
                                 </AlertDialogDescription>
                               </AlertDialogHeader>
                               <AlertDialogFooter>
                                 <AlertDialogCancel>Cancelar</AlertDialogCancel>
                                 <AlertDialogAction
                                   className="bg-red-800 hover:bg-red-700"
-                                  onClick={() => {
-                                    if (selectedToDelete !== null) {
-                                      handleDelete(selectedToDelete);
-                                      setSelectedToDelete(null);
-                                    }
-                                  }}
+                                  onClick={() => handleDelete(da.id)}
                                 >
                                   Eliminar
                                 </AlertDialogAction>
@@ -483,8 +459,86 @@ export default function ManageDailyActivitiesPage() {
                   ))}
                 </TableBody>
               </Table>
-            </div>
-          )}
+            )}
+          </div>
+
+          {/* Cards para móvil */}
+          <div className="sm:hidden grid gap-3">
+            {dailyActivities.length === 0 ? (
+              <p className="text-center text-muted-foreground">
+                No hay actividades diarias registradas.
+              </p>
+            ) : (
+              dailyActivities.map((da) => (
+                <div
+                  key={da.id}
+                  className="border rounded-md p-4 shadow-sm space-y-2 bg-white"
+                >
+                  <div className="flex justify-between items-start">
+                    <h3 className="font-semibold text-lg">{da.type}</h3>
+                    <div className="flex gap-2">
+                      <Button
+                        variant="ghost"
+                        size="icon"
+                        onClick={() => handleEdit(da)}
+                        aria-label="Editar"
+                      >
+                        <Pencil className="h-4 w-4" />
+                      </Button>
+                      <AlertDialog>
+                        <AlertDialogTrigger asChild>
+                          <Button
+                            variant="ghost"
+                            size="icon"
+                            onClick={() => setSelectedToDelete(da.id)}
+                            aria-label="Eliminar"
+                          >
+                            <Trash2 className="h-4 w-4 text-red-600" />
+                          </Button>
+                        </AlertDialogTrigger>
+                        <AlertDialogContent>
+                          <AlertDialogHeader>
+                            <AlertDialogTitle>
+                              Eliminación de actividad diaria
+                            </AlertDialogTitle>
+                            <AlertDialogDescription>
+                              Esta acción eliminará la actividad diaria
+                              permanentemente. ¿Deseas continuar?
+                            </AlertDialogDescription>
+                          </AlertDialogHeader>
+                          <AlertDialogFooter>
+                            <AlertDialogCancel>Cancelar</AlertDialogCancel>
+                            <AlertDialogAction
+                              className="bg-red-800 hover:bg-red-700"
+                              onClick={() => {
+                                if (selectedToDelete !== null) {
+                                  handleDelete(selectedToDelete);
+                                  setSelectedToDelete(null);
+                                }
+                              }}
+                            >
+                              Eliminar
+                            </AlertDialogAction>
+                          </AlertDialogFooter>
+                        </AlertDialogContent>
+                      </AlertDialog>
+                    </div>
+                  </div>
+
+                  <p>
+                    <strong>Duración:</strong> {da.duration} minutos
+                  </p>
+                  <p>
+                    <strong>Notas:</strong> {da.notes}
+                  </p>
+                  <p>
+                    <strong>Fecha:</strong>{" "}
+                    {format(da.date, "dd/MM/yyyy", { locale: es })}
+                  </p>
+                </div>
+              ))
+            )}
+          </div>
         </>
       )}
     </div>

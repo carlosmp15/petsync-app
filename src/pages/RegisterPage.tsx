@@ -32,6 +32,7 @@ export default function RegisterPage() {
   const onSubmit = async (data: RegisterFormInputs) => {
     try {
       const result = await createNewUser(data.name, data.surname, data.email, data.phone, data.password, data.birthday)
+      console.log(result)
       if (result?.success) {
         toast.success(result.message as string, {
           autoClose: 2000,
@@ -127,13 +128,14 @@ export default function RegisterPage() {
                     render={({ field, fieldState }) => (
                       <>
                         <PhoneInput
-                          id="phone-number"
-                          placeholder="Ej. 641 12 32 90"
-                          defaultCountry="ES"
-                          {...field}
-                          onChange={(value) => field.onChange(value || "")}
-                          value={field.value || ""}
-                        />
+                            id="phone-number"
+                            placeholder="Ej. 641 12 32 90"
+                            defaultCountry="ES"
+                            {...field}
+                            onChange={(value) => field.onChange(value || "")}
+                            value={field.value || ""}
+                          />
+
                         {fieldState.error && <span className="text-red-500 text-sm">{fieldState.error.message}</span>}
                       </>
                     )}

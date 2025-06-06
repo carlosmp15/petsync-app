@@ -26,9 +26,9 @@ export function DatePicker({
   const [date, setDate] = useState<Date>(selected || birthday || new Date()) 
 
   const months = [
-    "January", "February", "March", "April", "May", "June", "July",
-    "August", "September", "October", "November", "December",
-  ]
+    "Enero", "Febrero", "Marzo", "Abril", "Mayo", "Junio",
+    "Julio", "Agosto", "Septiembre", "Octubre", "Noviembre", "Diciembre",
+  ];
 
   const years = Array.from({ length: endYear - startYear + 1 }, (_, i) => startYear + i)
 

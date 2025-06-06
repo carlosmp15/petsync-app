@@ -1,3 +1,7 @@
+"use client"
+
+import type React from "react"
+
 import { ChevronsUpDown, PawPrint, Plus } from "lucide-react"
 import {
   DropdownMenu,
@@ -7,21 +11,15 @@ import {
   DropdownMenuSeparator,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu"
-import {
-  SidebarMenu,
-  SidebarMenuButton,
-  SidebarMenuItem,
-  useSidebar,
-} from "@/components/ui/sidebar"
+import { SidebarMenu, SidebarMenuButton, SidebarMenuItem, useSidebar } from "@/components/ui/sidebar"
 import { useEffect, useState } from "react"
 import { createNewPet } from "@/services/PetService"
 import { useSelectedPetStore } from "@/stores/selectedPetStore"
 import { toast } from "react-toastify"
-import { format, set } from "date-fns"
+import { format } from "date-fns"
 import { useNavigate } from "react-router-dom"
 import { PetFormDialog } from "./PetFormDialog"
 import { getUserDataFromLocalStorage } from "@/utils"
-import { useUserUpdateStore } from "@/stores/userUpdated"
 
 export function TeamSwitcher({
   teams,
@@ -32,7 +30,7 @@ export function TeamSwitcher({
     logo: React.ElementType
   }[]
 }) {
-  const { isMobile } = useSidebar()
+  const { isMobile, setOpenMobile } = useSidebar()
   const [openDialog, setOpenDialog] = useState(false)
 
   const { id, setSelectedPet, resetSelectedPet } = useSelectedPetStore()
@@ -41,7 +39,7 @@ export function TeamSwitcher({
 
   useEffect(() => {
     if (teams.length > 0) {
-      const selectedTeam = teams.find(team => team.id === id)
+      const selectedTeam = teams.find((team) => team.id === id)
 
       if (!selectedTeam) {
         setSelectedPet({ id: teams[0].id, name: teams[0].name })
@@ -49,9 +47,9 @@ export function TeamSwitcher({
     } else {
       resetSelectedPet()
     }
-  }, [teams, id])
+  }, [teams, id, setSelectedPet, resetSelectedPet])
 
-  const activeTeam = teams.find(team => team.id === id) || null
+  const activeTeam = teams.find((team) => team.id === id) || null
 
   const handleSubmitNewPet = async (data: any, photo: string) => {
     try {
@@ -61,8 +59,8 @@ export function TeamSwitcher({
         data.breed,
         data.gender,
         data.weight,
-        format(data.birthday, 'yyyy-MM-dd'),
-        photo
+        format(data.birthday, "yyyy-MM-dd"),
+        photo,
       )
 
       if (result?.success) {
@@ -70,7 +68,7 @@ export function TeamSwitcher({
         setOpenDialog(false)
 
         setTimeout(() => {
-          navigate(0)
+          window.location.reload()
         }, 2300)
       } else {
         toast.error(result?.message || "Error al crear la mascota.")
@@ -78,6 +76,15 @@ export function TeamSwitcher({
     } catch (error) {
       console.error("Error creando mascota:", error)
       toast.error("Hubo un error al guardar la mascota.")
+    }
+  }
+
+  const handleTeamSelect = (teamId: number, teamName: string) => {
+    setSelectedPet({ id: teamId, name: teamName })
+
+    // Close sidebar on mobile when a team is selected
+    if (isMobile) {
+      setOpenMobile(false)
     }
   }
 
@@ -91,16 +98,10 @@ export function TeamSwitcher({
               className="data-[state=open]:bg-sidebar-accent data-[state=open]:text-sidebar-accent-foreground"
             >
               <div className="flex aspect-square size-8 items-center justify-center rounded-lg bg-sidebar-primary text-sidebar-primary-foreground">
-                {activeTeam ? (
-                  <activeTeam.logo className="size-4" />
-                ) : (
-                  <PawPrint className="size-4" />
-                )}
+                {activeTeam ? <activeTeam.logo className="size-4" /> : <PawPrint className="size-4" />}
               </div>
               <div className="grid flex-1 text-left text-sm leading-tight">
-                <span className="truncate font-semibold">
-                  {activeTeam ? activeTeam.name : "Sin mascotas"}
-                </span>
+                <span className="truncate font-semibold">{activeTeam ? activeTeam.name : "Sin mascotas"}</span>
               </div>
               <ChevronsUpDown className="ml-auto" />
             </SidebarMenuButton>
@@ -112,16 +113,14 @@ export function TeamSwitcher({
             side={isMobile ? "bottom" : "right"}
             sideOffset={4}
           >
-            <DropdownMenuLabel className="text-xs text-muted-foreground">
-              Mis Mascotas
-            </DropdownMenuLabel>
+            <DropdownMenuLabel className="text-xs text-muted-foreground">Mis Mascotas</DropdownMenuLabel>
 
             {teams.length > 0 ? (
               teams.map((team) => (
                 <DropdownMenuItem
                   key={team.name}
                   onClick={() => {
-                    setSelectedPet({ id: team.id, name: team.name })
+                    handleTeamSelect(team.id, team.name)
                   }}
                   className="gap-2 p-2 cursor-pointer"
                 >
@@ -132,9 +131,7 @@ export function TeamSwitcher({
                 </DropdownMenuItem>
               ))
             ) : (
-              <div className="p-2 text-sm text-muted-foreground">
-                No tienes mascotas aún.
-              </div>
+              <div className="p-2 text-sm text-muted-foreground">No tienes mascotas aún.</div>
             )}
 
             <DropdownMenuSeparator />
@@ -151,16 +148,16 @@ export function TeamSwitcher({
               </div>
               <div className="font-medium text-muted-foreground">Nueva mascota</div>
             </DropdownMenuItem>
-
-            <PetFormDialog
-              open={openDialog}
-              onOpenChange={setOpenDialog}
-              onSubmit={handleSubmitNewPet} 
-              defaultPhoto={""} 
-              isEdit={false}
-            />
           </DropdownMenuContent>
         </DropdownMenu>
+
+        <PetFormDialog
+          open={openDialog}
+          onOpenChange={setOpenDialog}
+          onSubmit={handleSubmitNewPet}
+          defaultPhoto={""}
+          isEdit={false}
+        />
       </SidebarMenuItem>
     </SidebarMenu>
   )

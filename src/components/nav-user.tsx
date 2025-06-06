@@ -1,8 +1,14 @@
-"use client"
+import {
+  ChevronsUpDown,
+  LogOut,
+  Settings,
+} from "lucide-react"
 
-import { ChevronsUpDown, LogOut, Settings } from "lucide-react"
-
-import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar"
+import {
+  Avatar,
+  AvatarFallback,
+  AvatarImage,
+} from "@/components/ui/avatar"
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -12,7 +18,12 @@ import {
   DropdownMenuSeparator,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu"
-import { SidebarMenu, SidebarMenuButton, SidebarMenuItem, useSidebar } from "@/components/ui/sidebar"
+import {
+  SidebarMenu,
+  SidebarMenuButton,
+  SidebarMenuItem,
+  useSidebar,
+} from "@/components/ui/sidebar"
 import { useNavigate } from "react-router-dom"
 import { NavLink } from "react-router-dom"
 import { useUserStore } from "@/stores/userStore"
@@ -27,20 +38,10 @@ export function NavUser({
     avatar: string
   }
 }) {
-  const { isMobile, setOpenMobile } = useSidebar()
+  const { isMobile } = useSidebar()
   const { resetUser } = useUserStore()
   const navigate = useNavigate()
-
-  const handleNavClick = () => {
-    if (isMobile) {
-      setOpenMobile(false)
-    }
-  }
-
-  const handleLogoutClick = () => {
-    handleLogout(navigate, resetUser)
-    handleNavClick()
-  }
+  
 
   return (
     <SidebarMenu>
@@ -52,7 +53,7 @@ export function NavUser({
               className="data-[state=open]:bg-sidebar-accent data-[state=open]:text-sidebar-accent-foreground"
             >
               <Avatar className="h-8 w-8 rounded-lg">
-                <AvatarImage src={user.avatar || "/placeholder.svg"} alt={user.name} />
+                <AvatarImage src={user.avatar} alt={user.name} />
                 <AvatarFallback className="rounded-lg">CN</AvatarFallback>
               </Avatar>
               <div className="grid flex-1 text-left text-sm leading-tight">
@@ -71,7 +72,7 @@ export function NavUser({
             <DropdownMenuLabel className="p-0 font-normal">
               <div className="flex items-center gap-2 px-1 py-1.5 text-left text-sm">
                 <Avatar className="h-8 w-8 rounded-lg">
-                  <AvatarImage src={user.avatar || "/placeholder.svg"} alt={user.name} />
+                  <AvatarImage src={user.avatar} alt={user.name} />
                   <AvatarFallback className="rounded-lg">CN</AvatarFallback>
                 </Avatar>
                 <div className="grid flex-1 text-left text-sm leading-tight">
@@ -82,15 +83,21 @@ export function NavUser({
             </DropdownMenuLabel>
             <DropdownMenuSeparator />
             <DropdownMenuGroup>
-              <NavLink to="/account/settings" onClick={handleNavClick}>
-                <DropdownMenuItem className="cursor-pointer">
+            <NavLink to="/account/settings"
+            >
+              <DropdownMenuItem
+                className="cursor-pointer"
+              >
                   <Settings />
                   Ajustes
-                </DropdownMenuItem>
-              </NavLink>
+              </DropdownMenuItem>
+            </NavLink>
             </DropdownMenuGroup>
             <DropdownMenuSeparator />
-            <DropdownMenuItem className="cursor-pointer" onClick={handleLogoutClick}>
+            <DropdownMenuItem 
+              className="cursor-pointer"
+              onClick={() => handleLogout(navigate, resetUser)}
+            >
               <LogOut />
               Cerrar sesión
             </DropdownMenuItem>
