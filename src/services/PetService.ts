@@ -1,4 +1,5 @@
-import { BreedsData } from "@/types"
+import { BreedsData, ComboBoxItem } from "@/types"
+import { capitalizeWithSpaces } from "@/utils"
 import axios from "axios"
 
 const OK_CODE = 200 // Código OK de la API
@@ -33,7 +34,7 @@ export async function createNewPet(user_id: number | undefined, name: string, br
         return { success: true, message: "Error al crear la mascota" }
     }
   } catch (error) {
-    return { success: false, message: error }
+    return { success: false, message: "Ha ocurrido un error de conexión." }
   }
 }
 
@@ -71,34 +72,71 @@ export async function getPetImage(petName: string) {
 }
 
 // Función que obtiene todas las razas de animales filtradas 
-export async function getFilteredBreeds(searchTerm: string) {
+// export async function getFilteredBreeds(searchTerm: string) {
+//   try {
+//     const url = `${import.meta.env.VITE_PET_API_URL}/breeds/list/all`;
+//     const response = await axios.get(url);
+
+//     if (response.status === 200) {
+//       const data: BreedsData = response.data.message
+//       const allBreeds: string[] = [];
+          
+//     Object.entries(data).forEach(([breed, subBreeds]) => {
+//       if (subBreeds.length === 0) {
+//         allBreeds.push(breed); // solo raza
+//       } else {
+//         subBreeds.forEach(sub => {
+//           allBreeds.push(`${breed} ${sub}`);
+//         });
+//       }
+//     });
+
+//       const lowerTerm = searchTerm.toLowerCase();
+//       return allBreeds.filter(breed => breed.toLowerCase().includes(lowerTerm));
+//     } else {
+//       console.error('Error al obtener las razas');
+//       return [];
+//     }
+//   } catch (error) {
+//     console.error('Error en la petición:', error);
+//     return [];
+//   }
+// }
+
+export async function getFilteredBreeds(): Promise<ComboBoxItem[]> {
   try {
-    const url = `${import.meta.env.VITE_PET_API_URL}/breeds/list/all`;
-    const response = await axios.get(url);
+    const url = `${import.meta.env.VITE_PET_API_URL}/breeds/list/all`
+    const response = await axios.get(url)
 
     if (response.status === 200) {
       const data: BreedsData = response.data.message
-      const allBreeds: string[] = [];
-          
-    Object.entries(data).forEach(([breed, subBreeds]) => {
-      if (subBreeds.length === 0) {
-        allBreeds.push(breed); // solo raza
-      } else {
-        subBreeds.forEach(sub => {
-          allBreeds.push(`${breed} ${sub}`);
-        });
-      }
-    });
+      const allBreeds: ComboBoxItem[] = []
 
-      const lowerTerm = searchTerm.toLowerCase();
-      return allBreeds.filter(breed => breed.toLowerCase().includes(lowerTerm));
+      Object.entries(data).forEach(([breed, subBreeds]) => {
+        if (subBreeds.length === 0) {
+          allBreeds.push({
+            value: breed,
+            label: capitalizeWithSpaces(breed),
+          })
+        } else {
+          subBreeds.forEach((sub) => {
+            const full = `${breed} ${sub}`
+            allBreeds.push({
+              value: full,
+              label: capitalizeWithSpaces(full),
+            })
+          })
+        }
+      })
+
+      return allBreeds
     } else {
-      console.error('Error al obtener las razas');
-      return [];
+      console.error("Error al obtener las razas")
+      return []
     }
   } catch (error) {
-    console.error('Error en la petición:', error);
-    return [];
+    console.error("Error en la petición:", error)
+    return []
   }
 }
 

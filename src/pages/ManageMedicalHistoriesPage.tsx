@@ -432,13 +432,13 @@ export default function ManageMedicalHistoriesPage() {
 
               {/* Tabla para pantallas medianas y grandes */}
               <div className="hidden sm:block border rounded-md">
-                <Table>
+                <Table className="overflow-hidden rounded-md">
                   <TableHeader>
-                    <TableRow>
-                      <TableHead>Tipo</TableHead>
-                      <TableHead>Descripción</TableHead>
-                      <TableHead>Fecha</TableHead>
-                      <TableHead className="text-right">Acciones</TableHead>
+                    <TableRow className="bg-[#2B2B2B] hover:bg-[#3A3A3A] rounded-t-md transition-colors">
+                      <TableHead className="text-white pl-3">Tipo</TableHead>
+                      <TableHead className="text-white">Descripción</TableHead>
+                      <TableHead className="text-white">Fecha</TableHead>
+                      <TableHead className="text-right text-white pr-3">Acciones</TableHead>
                     </TableRow>
                   </TableHeader>
                   <TableBody>

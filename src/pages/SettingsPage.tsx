@@ -86,11 +86,18 @@ export default function SettingsPage() {
 
   if (!isUserLoaded) return <div>Cargando datos del usuario...</div>
 
-  const handleUpdate = async (event: React.FormEvent) => {
-    event.preventDefault()
+  const handleUpdate = async () => {
 
     if (error && (password || confirmPasswd)) {
       toast.warning("Las contraseñas no coinciden o están incompletas", {
+        autoClose: 2000
+      })
+      setIsOpenSave(false)
+      return
+    }
+
+    if( !name || !surname || !email || !phone || !birthday) {
+      toast.warning("Por favor, complete todos los campos requeridos", {
         autoClose: 2000
       })
       setIsOpenSave(false)
@@ -147,7 +154,7 @@ export default function SettingsPage() {
           handleLogout(navigate, resetUser)
         }, 2500)
       } else {
-        toast.error("Error al eliminar la cuenta: " + result?.message)
+        toast.error(result?.message)
       }
     } catch (error) {
       toast.error("Error inesperado al eliminar la cuenta.")

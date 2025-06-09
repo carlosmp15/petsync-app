@@ -4,7 +4,7 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { toast, ToastContainer } from "react-toastify";
 import { resetPassword } from "@/services/UserService";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 
 interface FormValues {
   password1: string;
@@ -17,12 +17,20 @@ export default function ChangePasswordPage() {
   const [params] = useSearchParams();
   const token = params.get("token");
 
+  useEffect(() => {
+    if (!token) {
+      navigate("/account/login")
+    }
+  }, [token, navigate])
+
   const {
     register,
     handleSubmit,
     watch,
     formState: { errors },
   } = useForm<FormValues>();
+
+  
 
   const onSubmit = async ({ password1 }: FormValues) => {
     if (!token) {

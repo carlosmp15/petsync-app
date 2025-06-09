@@ -1,5 +1,3 @@
-"use client"
-
 import type React from "react"
 
 import { ChevronsUpDown, PawPrint, Plus } from "lucide-react"

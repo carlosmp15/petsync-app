@@ -20,7 +20,6 @@ export function PetCard({ id, name, breed, gender, weight, birthday, photo, onDe
   const [showDeleteDialog, setShowDeleteDialog] = useState(false)
   const [showUpdateDialog, setShowUpdateDialog] = useState(false)
   const navigate = useNavigate()
-
   const capitalize = (str: string) => str.charAt(0).toUpperCase() + str.slice(1).toLowerCase()
 
   const handleEdit = () => {

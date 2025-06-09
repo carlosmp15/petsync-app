@@ -386,159 +386,157 @@ export default function ManageDailyActivitiesPage() {
             </Dialog>
           </div>
 
-          {/* Tabla para escritorio */}
-          <div className="hidden sm:block border rounded-md">
-            {dailyActivities.length === 0 ? (
-              <div className="text-center py-10 text-muted-foreground">
-                No hay actividades diarias registradas.
-              </div>
-            ) : (
-              <Table>
-                <TableHeader>
-                  <TableRow>
-                    <TableHead>Tipo</TableHead>
-                    <TableHead>Duración</TableHead>
-                    <TableHead>Notas</TableHead>
-                    <TableHead>Fecha</TableHead>
-                    <TableHead className="text-right">Acciones</TableHead>
-                  </TableRow>
-                </TableHeader>
-                <TableBody>
-                  {dailyActivities.map((da) => (
-                    <TableRow key={da.id}>
-                      <TableCell className="font-medium">{da.type}</TableCell>
-                      <TableCell>{da.duration} minutos</TableCell>
-                      <TableCell>{da.notes}</TableCell>
-                      <TableCell>
-                        {format(da.date, "dd/MM/yyyy", { locale: es })}
-                      </TableCell>
-                      <TableCell className="text-right">
-                        <div className="flex justify-end gap-2">
-                          <Button
-                            variant="ghost"
-                            size="icon"
-                            onClick={() => handleEdit(da)}
-                            aria-label="Editar"
-                          >
-                            <Pencil className="h-4 w-4" />
-                          </Button>
-                          <AlertDialog>
-                            <AlertDialogTrigger asChild>
-                              <Button
-                                variant="ghost"
-                                size="icon"
-                                aria-label="Eliminar"
-                              >
-                                <Trash2 className="h-4 w-4 text-red-600" />
-                              </Button>
-                            </AlertDialogTrigger>
-                            <AlertDialogContent>
-                              <AlertDialogHeader>
-                                <AlertDialogTitle>
-                                  ¿Eliminar actividad diaria?
-                                </AlertDialogTitle>
-                                <AlertDialogDescription>
-                                  Esta acción no se puede deshacer. ¿Está seguro
-                                  de eliminar esta actividad?
-                                </AlertDialogDescription>
-                              </AlertDialogHeader>
-                              <AlertDialogFooter>
-                                <AlertDialogCancel>Cancelar</AlertDialogCancel>
-                                <AlertDialogAction
-                                  className="bg-red-800 hover:bg-red-700"
-                                  onClick={() => handleDelete(da.id)}
-                                >
-                                  Eliminar
-                                </AlertDialogAction>
-                              </AlertDialogFooter>
-                            </AlertDialogContent>
-                          </AlertDialog>
-                        </div>
-                      </TableCell>
-                    </TableRow>
-                  ))}
-                </TableBody>
-              </Table>
-            )}
-          </div>
-
-          {/* Cards para móvil */}
-          <div className="sm:hidden grid gap-3">
-            {dailyActivities.length === 0 ? (
-              <p className="text-center text-muted-foreground">
-                No hay actividades diarias registradas.
-              </p>
-            ) : (
-              dailyActivities.map((da) => (
-                <div
-                  key={da.id}
-                  className="border rounded-md p-4 shadow-sm space-y-2 bg-white"
-                >
-                  <div className="flex justify-between items-start">
-                    <h3 className="font-semibold text-lg">{da.type}</h3>
-                    <div className="flex gap-2">
-                      <Button
-                        variant="ghost"
-                        size="icon"
-                        onClick={() => handleEdit(da)}
-                        aria-label="Editar"
-                      >
-                        <Pencil className="h-4 w-4" />
-                      </Button>
-                      <AlertDialog>
-                        <AlertDialogTrigger asChild>
-                          <Button
-                            variant="ghost"
-                            size="icon"
-                            onClick={() => setSelectedToDelete(da.id)}
-                            aria-label="Eliminar"
-                          >
-                            <Trash2 className="h-4 w-4 text-red-600" />
-                          </Button>
-                        </AlertDialogTrigger>
-                        <AlertDialogContent>
-                          <AlertDialogHeader>
-                            <AlertDialogTitle>
-                              Eliminación de actividad diaria
-                            </AlertDialogTitle>
-                            <AlertDialogDescription>
-                              Esta acción eliminará la actividad diaria
-                              permanentemente. ¿Deseas continuar?
-                            </AlertDialogDescription>
-                          </AlertDialogHeader>
-                          <AlertDialogFooter>
-                            <AlertDialogCancel>Cancelar</AlertDialogCancel>
-                            <AlertDialogAction
-                              className="bg-red-800 hover:bg-red-700"
-                              onClick={() => {
-                                if (selectedToDelete !== null) {
-                                  handleDelete(selectedToDelete);
-                                  setSelectedToDelete(null);
-                                }
-                              }}
+          {dailyActivities.length === 0 ? (
+            <div className="text-center py-10 text-muted-foreground">
+              No hay actividades diarias registradas.
+            </div>
+          ) : (
+            <>
+              {/* Tabla para escritorio */}
+              <div className="hidden sm:block border rounded-md">
+            <Table className="overflow-hidden rounded-md">
+              <TableHeader>
+                <TableRow className="bg-[#2B2B2B] hover:bg-[#3A3A3A] rounded-t-md transition-colors">
+                  <TableHead className="text-white pl-3">Tipo</TableHead>
+                  <TableHead className="text-white">Duración</TableHead>
+                  <TableHead className="text-white">Notas</TableHead>
+                  <TableHead className="text-white">Fecha</TableHead>
+                  <TableHead className="text-right text-white pr-3">Acciones</TableHead>
+                </TableRow>
+              </TableHeader>
+                  <TableBody>
+                    {dailyActivities.map((da) => (
+                      <TableRow key={da.id}>
+                        <TableCell className="font-medium">{da.type}</TableCell>
+                        <TableCell>{da.duration} minutos</TableCell>
+                        <TableCell>{da.notes}</TableCell>
+                        <TableCell>
+                          {format(da.date, "dd/MM/yyyy", { locale: es })}
+                        </TableCell>
+                        <TableCell className="text-right">
+                          <div className="flex justify-end gap-2">
+                            <Button
+                              variant="ghost"
+                              size="icon"
+                              onClick={() => handleEdit(da)}
+                              aria-label="Editar"
                             >
-                              Eliminar
-                            </AlertDialogAction>
-                          </AlertDialogFooter>
-                        </AlertDialogContent>
-                      </AlertDialog>
-                    </div>
-                  </div>
+                              <Pencil className="h-4 w-4" />
+                            </Button>
+                            <AlertDialog>
+                              <AlertDialogTrigger asChild>
+                                <Button
+                                  variant="ghost"
+                                  size="icon"
+                                  aria-label="Eliminar"
+                                >
+                                  <Trash2 className="h-4 w-4 text-red-600" />
+                                </Button>
+                              </AlertDialogTrigger>
+                              <AlertDialogContent>
+                                <AlertDialogHeader>
+                                  <AlertDialogTitle>
+                                    ¿Eliminar actividad diaria?
+                                  </AlertDialogTitle>
+                                  <AlertDialogDescription>
+                                    Esta acción no se puede deshacer. ¿Está
+                                    seguro de eliminar esta actividad?
+                                  </AlertDialogDescription>
+                                </AlertDialogHeader>
+                                <AlertDialogFooter>
+                                  <AlertDialogCancel>
+                                    Cancelar
+                                  </AlertDialogCancel>
+                                  <AlertDialogAction
+                                    className="bg-red-800 hover:bg-red-700"
+                                    onClick={() => handleDelete(da.id)}
+                                  >
+                                    Eliminar
+                                  </AlertDialogAction>
+                                </AlertDialogFooter>
+                              </AlertDialogContent>
+                            </AlertDialog>
+                          </div>
+                        </TableCell>
+                      </TableRow>
+                    ))}
+                  </TableBody>
+                </Table>
+              </div>
 
-                  <p>
-                    <strong>Duración:</strong> {da.duration} minutos
-                  </p>
-                  <p>
-                    <strong>Notas:</strong> {da.notes}
-                  </p>
-                  <p>
-                    <strong>Fecha:</strong>{" "}
-                    {format(da.date, "dd/MM/yyyy", { locale: es })}
-                  </p>
-                </div>
-              ))
-            )}
-          </div>
+              {/* Cards para móvil */}
+              <div className="sm:hidden grid gap-3">
+                {dailyActivities.map((da) => (
+                  <div
+                    key={da.id}
+                    className="border rounded-md p-4 shadow-sm space-y-2 bg-white"
+                  >
+                    <div className="flex justify-between items-start">
+                      <h3 className="font-semibold text-lg">{da.type}</h3>
+                      <div className="flex gap-2">
+                        <Button
+                          variant="ghost"
+                          size="icon"
+                          onClick={() => handleEdit(da)}
+                          aria-label="Editar"
+                        >
+                          <Pencil className="h-4 w-4" />
+                        </Button>
+                        <AlertDialog>
+                          <AlertDialogTrigger asChild>
+                            <Button
+                              variant="ghost"
+                              size="icon"
+                              onClick={() => setSelectedToDelete(da.id)}
+                              aria-label="Eliminar"
+                            >
+                              <Trash2 className="h-4 w-4 text-red-600" />
+                            </Button>
+                          </AlertDialogTrigger>
+                          <AlertDialogContent>
+                            <AlertDialogHeader>
+                              <AlertDialogTitle>
+                                Eliminación de actividad diaria
+                              </AlertDialogTitle>
+                              <AlertDialogDescription>
+                                Esta acción eliminará la actividad diaria
+                                permanentemente. ¿Deseas continuar?
+                              </AlertDialogDescription>
+                            </AlertDialogHeader>
+                            <AlertDialogFooter>
+                              <AlertDialogCancel>Cancelar</AlertDialogCancel>
+                              <AlertDialogAction
+                                className="bg-red-800 hover:bg-red-700"
+                                onClick={() => {
+                                  if (selectedToDelete !== null) {
+                                    handleDelete(selectedToDelete);
+                                    setSelectedToDelete(null);
+                                  }
+                                }}
+                              >
+                                Eliminar
+                              </AlertDialogAction>
+                            </AlertDialogFooter>
+                          </AlertDialogContent>
+                        </AlertDialog>
+                      </div>
+                    </div>
+
+                    <p>
+                      <strong>Duración:</strong> {da.duration} minutos
+                    </p>
+                    <p>
+                      <strong>Notas:</strong> {da.notes}
+                    </p>
+                    <p>
+                      <strong>Fecha:</strong>{" "}
+                      {format(da.date, "dd/MM/yyyy", { locale: es })}
+                    </p>
+                  </div>
+                ))}
+              </div>
+            </>
+          )}
         </>
       )}
     </div>

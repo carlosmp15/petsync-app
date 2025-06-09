@@ -53,7 +53,7 @@ export async function updateUserData(id: number | undefined, name: string, surna
       return { success: false, message: "No se han podido actualizar los datos personales. \nInténtelo de nuevo más tarde." }
     }    
   } catch (error) {
-    return { success: false, message: error}
+    return { success: false, message: "Ha ocurrido un error de conexión."}
   }
 }
 

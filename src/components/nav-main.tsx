@@ -1,5 +1,3 @@
-"use client"
-
 import { ChevronRight, Home, type LucideIcon } from "lucide-react"
 import { Collapsible, CollapsibleContent, CollapsibleTrigger } from "@/components/ui/collapsible"
 import {

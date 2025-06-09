@@ -21,6 +21,8 @@ import { DatePicker } from "@/components/ui/date-picker"
 import { useEffect, useState } from "react"
 import { Controller, useForm } from "react-hook-form"
 import { getFilteredBreeds, getPetImage } from "@/services/PetService"
+import { ComboBox } from "./ComboBox"
+import { ComboBoxItem } from "@/types"
 
 interface PetFormData {
   name: string
@@ -51,6 +53,7 @@ export function PetFormDialog({
     register,
     handleSubmit,
     setValue,
+    getValues,
     watch,
     reset,
     control,
@@ -65,15 +68,28 @@ export function PetFormDialog({
     },
   })
 
+  const [breeds, setBreeds] = useState<ComboBoxItem[]>([])
+  const [userChangedBreed, setUserChangedBreed] = useState(false)
   const breed = watch("breed")
   const [photo, setPhoto] = useState(defaultPhoto)
-  const [breedSuggestions, setBreedSuggestions] = useState<string[]>([])
 
   useEffect(() => {
-    if (breed && breedSuggestions.includes(breed)) {
+    if (breed && (!isEdit || userChangedBreed)) {
       handleChangePhoto(breed)
     }
-  }, [breed])
+  }, [breed, isEdit, userChangedBreed])
+
+
+
+  useEffect(() => {
+    const fetchBreeds = async () => {
+      const allBreeds = await getFilteredBreeds()
+      if(allBreeds) {
+        setBreeds(allBreeds)
+      }
+    }
+    fetchBreeds()
+  }, [])
 
   useEffect(() => {
     if (open) {
@@ -98,9 +114,6 @@ export function PetFormDialog({
 
       reset(resetValues);
       setPhoto(defaultPhoto);
-    } else {
-
-      setBreedSuggestions([]);
     }
   }, [open, defaultValues, defaultPhoto, reset, isEdit]);
 
@@ -108,17 +121,6 @@ export function PetFormDialog({
     const url = await getPetImage(selectedBreed)
     if (url.success && url.message) {
       setPhoto(url.message)
-    }
-  }
-
-  const handleBreedInputChange = async (e: React.ChangeEvent<HTMLInputElement>) => {
-    const input = e.target.value
-    setValue("breed", input, { shouldValidate: true })
-    if (input.length >= 2) {
-      const filtered = await getFilteredBreeds(input)
-      setBreedSuggestions(filtered.slice(0, 6))
-    } else {
-      setBreedSuggestions([])
     }
   }
 
@@ -160,25 +162,15 @@ export function PetFormDialog({
           {/* Raza */}
           <div className="flex flex-col gap-1">
             <Label htmlFor="breed">Raza</Label>
-            <Input
-              id="breed"
-              placeholder="Raza de la mascota"
-              list="breed-suggestions"
-              value={breed}
-              {...register("breed", {
-                validate: (v) => (v && v.trim() !== "") || "La raza es requerida",
-              })}
-              onChange={(e) => {
-                handleBreedInputChange(e)
-                // Call react-hook-form's onChange as well
-                register("breed").onChange(e)
+            <ComboBox
+              items={breeds}
+              value={getValues("breed")}
+              onChange={(val) => {
+                setValue("breed", val)
+                setUserChangedBreed(true)
               }}
+              placeholder="Selecciona una raza"
             />
-            <datalist id="breed-suggestions">
-              {breedSuggestions.map((s) => (
-                <option key={s} value={s} />
-              ))}
-            </datalist>
             {errors.breed && (
               <span className="text-red-500 text-sm">{errors.breed.message}</span>
             )}
@@ -219,8 +211,13 @@ export function PetFormDialog({
               placeholder="Peso de la mascota"
               {...register("weight", {
                 valueAsNumber: true,
-                validate: (v) =>
-                  (v !== undefined && v >= 1) || "El peso debe ser al menos 1 kg",
+                validate: (v) => {
+                const num = Number(v);
+                if (isNaN(num) || num <= 0)
+                  return "El peso debe ser un número válido mayor a 0";
+                if (num > 60) return "El peso no puede ser mayor a 60 kg";
+                return true;
+              }
               })}
             />
             {errors.weight && (
@@ -257,7 +254,7 @@ export function PetFormDialog({
                 <img
                   src={photo}
                   alt={`Raza ${breed}`}
-                  className="w-full h-full object-cover rounded-lg"
+                  className="w-full h-full object-cover rounded-lg select-none"
                 />
                 <RotateCw
                   onClick={() => handleChangePhoto(breed)}

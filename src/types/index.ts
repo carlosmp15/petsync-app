@@ -89,3 +89,24 @@ export type FeedingProps = {
 export type BreedsData = {
   [breed: string]: string[]
 }
+
+export type ComboBoxItem = {
+  value: string
+  label: string
+}
+
+export interface ComboBoxProps {
+  items: ComboBoxItem[]
+  value: string
+  onChange: (value: string) => void
+  placeholder?: string
+  className?: string
+}
+
+export type FormData = {
+  name: string
+  surname: string
+  email: string
+  phone: string
+  birthday: Date | null
+}

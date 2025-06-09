@@ -1,5 +1,3 @@
-"use client"
-
 import { useNavigate, NavLink } from "react-router-dom"
 import { useEffect } from "react"
 import { useForm, Controller } from "react-hook-form"

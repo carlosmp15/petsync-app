@@ -392,165 +392,164 @@ export default function ManageFeedingsPage() {
             </Dialog>
           </div>
 
-          {/* Tabla para escritorio */}
-          <div className="hidden sm:block border rounded-md">
-            {feedings.length === 0 ? (
-              <div className="text-center py-10 text-muted-foreground">
-                No hay historiales alimentarios registrados.
-              </div>
-            ) : (
-              <Table>
-                <TableHeader>
-                  <TableRow>
-                    <TableHead>Tipo</TableHead>
-                    <TableHead>Descripción</TableHead>
-                    <TableHead>Cantidad (gramos)</TableHead>
-                    <TableHead>Fecha</TableHead>
-                    <TableHead>Acciones</TableHead>
-                  </TableRow>
-                </TableHeader>
-                <TableBody>
-                  {feedings.map((ms) => (
-                    <TableRow key={ms.id}>
-                      <TableCell>{ms.type}</TableCell>
-                      <TableCell>{ms.description}</TableCell>
-                      <TableCell>{ms.quantity}</TableCell>
-                      <TableCell>
-                        {format(ms.date, "dd/MM/yyyy", { locale: es })}
-                      </TableCell>
-                      <TableCell>
-                        <div className="flex gap-2">
-                          <Button
-                            variant="ghost"
-                            size="icon"
-                            onClick={() => handleEdit(ms)}
-                            aria-label="Editar"
-                          >
-                            <Pencil className="h-4 w-4" />
-                          </Button>
-                          <AlertDialog>
-                            <AlertDialogTrigger asChild>
-                              <Button
-                                variant="ghost"
-                                size="icon"
-                                onClick={() => setSelectedToDelete(ms.id)}
-                                aria-label="Eliminar"
-                              >
-                                <Trash2 className="h-4 w-4 text-red-600" />
-                              </Button>
-                            </AlertDialogTrigger>
-                            <AlertDialogContent>
-                              <AlertDialogHeader>
-                                <AlertDialogTitle>
-                                  Eliminación de historial alimentario
-                                </AlertDialogTitle>
-                                <AlertDialogDescription>
-                                  Esta acción eliminará el historial alimentario
-                                  permanentemente. ¿Deseas continuar?
-                                </AlertDialogDescription>
-                              </AlertDialogHeader>
-                              <AlertDialogFooter>
-                                <AlertDialogCancel>Cancelar</AlertDialogCancel>
-                                <AlertDialogAction
-                                  className="bg-red-800 hover:bg-red-700"
-                                  onClick={() => {
-                                    if (selectedToDelete !== null) {
-                                      handleDelete(selectedToDelete);
-                                      setSelectedToDelete(null);
-                                    }
-                                  }}
-                                >
-                                  Eliminar
-                                </AlertDialogAction>
-                              </AlertDialogFooter>
-                            </AlertDialogContent>
-                          </AlertDialog>
-                        </div>
-                      </TableCell>
+          {feedings.length === 0 ? (
+            <div className="text-center py-10 text-muted-foreground">
+              No hay historiales alimentarios registrados.
+            </div>
+          ) : (
+            <>
+              {/* Tabla para escritorio */}
+              <div className="hidden sm:block border rounded-md">
+                <Table className="overflow-hidden rounded-md">
+                  <TableHeader>
+                    <TableRow className="bg-[#2B2B2B] hover:bg-[#3A3A3A] rounded-t-md transition-colors">
+                      <TableHead className="text-white pl-3">Tipo</TableHead>
+                      <TableHead className="text-white">Descripción</TableHead>
+                      <TableHead className="text-white">Cantidad (gramos)</TableHead>
+                      <TableHead className="text-white">Fecha</TableHead>
+                      <TableHead className="text-white pl-5">Acciones</TableHead>
                     </TableRow>
-                  ))}
-                </TableBody>
-              </Table>
-            )}
-          </div>
-
-          {/* Cards para móvil */}
-          <div className="grid gap-4 sm:hidden">
-            {feedings.length === 0 ? (
-              <div className="text-center py-10 text-muted-foreground">
-                No hay historiales alimentarios registrados.
-              </div>
-            ) : (
-              feedings.map((ms) => (
-                <div
-                  key={ms.id}
-                  className="border rounded-md p-4 shadow-sm bg-white"
-                >
-                  <div className="flex justify-between items-start">
-                    <h3 className="font-semibold text-lg">{ms.type}</h3>
-                    <div className="flex gap-2">
-                      <Button
-                        variant="ghost"
-                        size="icon"
-                        onClick={() => handleEdit(ms)}
-                        aria-label="Editar"
-                      >
-                        <Pencil className="h-4 w-4" />
-                      </Button>
-                      <AlertDialog>
-                        <AlertDialogTrigger asChild>
-                          <Button
-                            variant="ghost"
-                            size="icon"
-                            onClick={() => setSelectedToDelete(ms.id)}
-                            aria-label="Eliminar"
-                          >
-                            <Trash2 className="h-4 w-4 text-red-600" />
-                          </Button>
-                        </AlertDialogTrigger>
-                        <AlertDialogContent>
-                          <AlertDialogHeader>
-                            <AlertDialogTitle>
-                              Eliminación de historial alimentario
-                            </AlertDialogTitle>
-                            <AlertDialogDescription>
-                              Esta acción eliminará el historial alimentario
-                              permanentemente. ¿Deseas continuar?
-                            </AlertDialogDescription>
-                          </AlertDialogHeader>
-                          <AlertDialogFooter>
-                            <AlertDialogCancel>Cancelar</AlertDialogCancel>
-                            <AlertDialogAction
-                              className="bg-red-800 hover:bg-red-700"
-                              onClick={() => {
-                                if (selectedToDelete !== null) {
-                                  handleDelete(selectedToDelete);
-                                  setSelectedToDelete(null);
-                                }
-                              }}
+                  </TableHeader>
+                  <TableBody>
+                    {feedings.map((ms) => (
+                      <TableRow key={ms.id}>
+                        <TableCell className="font-medium">{ms.type}</TableCell>
+                        <TableCell>{ms.description}</TableCell>
+                        <TableCell>{ms.quantity}</TableCell>
+                        <TableCell>
+                          {format(ms.date, "dd/MM/yyyy", { locale: es })}
+                        </TableCell>
+                        <TableCell>
+                          <div className="flex gap-2">
+                            <Button
+                              variant="ghost"
+                              size="icon"
+                              onClick={() => handleEdit(ms)}
+                              aria-label="Editar"
                             >
-                              Eliminar
-                            </AlertDialogAction>
-                          </AlertDialogFooter>
-                        </AlertDialogContent>
-                      </AlertDialog>
-                    </div>
-                  </div>
+                              <Pencil className="h-4 w-4" />
+                            </Button>
+                            <AlertDialog>
+                              <AlertDialogTrigger asChild>
+                                <Button
+                                  variant="ghost"
+                                  size="icon"
+                                  onClick={() => setSelectedToDelete(ms.id)}
+                                  aria-label="Eliminar"
+                                >
+                                  <Trash2 className="h-4 w-4 text-red-600" />
+                                </Button>
+                              </AlertDialogTrigger>
+                              <AlertDialogContent>
+                                <AlertDialogHeader>
+                                  <AlertDialogTitle>
+                                    Eliminación de historial alimentario
+                                  </AlertDialogTitle>
+                                  <AlertDialogDescription>
+                                    Esta acción eliminará el historial
+                                    alimentario permanentemente. ¿Deseas
+                                    continuar?
+                                  </AlertDialogDescription>
+                                </AlertDialogHeader>
+                                <AlertDialogFooter>
+                                  <AlertDialogCancel>
+                                    Cancelar
+                                  </AlertDialogCancel>
+                                  <AlertDialogAction
+                                    className="bg-red-800 hover:bg-red-700"
+                                    onClick={() => {
+                                      if (selectedToDelete !== null) {
+                                        handleDelete(selectedToDelete);
+                                        setSelectedToDelete(null);
+                                      }
+                                    }}
+                                  >
+                                    Eliminar
+                                  </AlertDialogAction>
+                                </AlertDialogFooter>
+                              </AlertDialogContent>
+                            </AlertDialog>
+                          </div>
+                        </TableCell>
+                      </TableRow>
+                    ))}
+                  </TableBody>
+                </Table>
+              </div>
 
-                  <p>
-                    <strong>Descripción:</strong> {ms.description}
-                  </p>
-                  <p>
-                    <strong>Cantidad:</strong> {ms.quantity} gramos
-                  </p>
-                  <p>
-                    <strong>Fecha:</strong>{" "}
-                    {format(ms.date, "dd/MM/yyyy", { locale: es })}
-                  </p>
-                </div>
-              ))
-            )}
-          </div>
+              {/* Cards para móvil */}
+              <div className="grid gap-4 sm:hidden">
+                {feedings.map((ms) => (
+                  <div
+                    key={ms.id}
+                    className="border rounded-md p-4 shadow-sm bg-white"
+                  >
+                    <div className="flex justify-between items-start">
+                      <h3 className="font-semibold text-lg">{ms.type}</h3>
+                      <div className="flex gap-2">
+                        <Button
+                          variant="ghost"
+                          size="icon"
+                          onClick={() => handleEdit(ms)}
+                          aria-label="Editar"
+                        >
+                          <Pencil className="h-4 w-4" />
+                        </Button>
+                        <AlertDialog>
+                          <AlertDialogTrigger asChild>
+                            <Button
+                              variant="ghost"
+                              size="icon"
+                              onClick={() => setSelectedToDelete(ms.id)}
+                              aria-label="Eliminar"
+                            >
+                              <Trash2 className="h-4 w-4 text-red-600" />
+                            </Button>
+                          </AlertDialogTrigger>
+                          <AlertDialogContent>
+                            <AlertDialogHeader>
+                              <AlertDialogTitle>
+                                Eliminación de historial alimentario
+                              </AlertDialogTitle>
+                              <AlertDialogDescription>
+                                Esta acción eliminará el historial alimentario
+                                permanentemente. ¿Deseas continuar?
+                              </AlertDialogDescription>
+                            </AlertDialogHeader>
+                            <AlertDialogFooter>
+                              <AlertDialogCancel>Cancelar</AlertDialogCancel>
+                              <AlertDialogAction
+                                className="bg-red-800 hover:bg-red-700"
+                                onClick={() => {
+                                  if (selectedToDelete !== null) {
+                                    handleDelete(selectedToDelete);
+                                    setSelectedToDelete(null);
+                                  }
+                                }}
+                              >
+                                Eliminar
+                              </AlertDialogAction>
+                            </AlertDialogFooter>
+                          </AlertDialogContent>
+                        </AlertDialog>
+                      </div>
+                    </div>
+
+                    <p>
+                      <strong>Descripción:</strong> {ms.description}
+                    </p>
+                    <p>
+                      <strong>Cantidad:</strong> {ms.quantity} gramos
+                    </p>
+                    <p>
+                      <strong>Fecha:</strong>{" "}
+                      {format(ms.date, "dd/MM/yyyy", { locale: es })}
+                    </p>
+                  </div>
+                ))}
+              </div>
+            </>
+          )}
         </>
       )}
     </div>
