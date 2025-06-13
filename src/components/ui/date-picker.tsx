@@ -108,6 +108,8 @@ export function DatePicker({
           initialFocus
           month={date}
           onMonthChange={setDate}
+          weekStartsOn={1} 
+          locale={es}
         />
       </PopoverContent>
     </Popover>

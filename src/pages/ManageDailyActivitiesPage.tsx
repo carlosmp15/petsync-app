@@ -201,6 +201,7 @@ export default function ManageDailyActivitiesPage() {
           });
         }
       }
+      fetchDailyActivities();
       setIsOpen(false);
     } catch {
       toast.error("Error al guardar la actividad diaria.");
@@ -394,16 +395,18 @@ export default function ManageDailyActivitiesPage() {
             <>
               {/* Tabla para escritorio */}
               <div className="hidden sm:block border rounded-md">
-            <Table className="overflow-hidden rounded-md">
-              <TableHeader>
-                <TableRow className="bg-[#2B2B2B] hover:bg-[#3A3A3A] rounded-t-md transition-colors">
-                  <TableHead className="text-white pl-3">Tipo</TableHead>
-                  <TableHead className="text-white">Duración</TableHead>
-                  <TableHead className="text-white">Notas</TableHead>
-                  <TableHead className="text-white">Fecha</TableHead>
-                  <TableHead className="text-right text-white pr-3">Acciones</TableHead>
-                </TableRow>
-              </TableHeader>
+                <Table className="overflow-hidden rounded-md">
+                  <TableHeader>
+                    <TableRow className="bg-[#2B2B2B] hover:bg-[#3A3A3A] rounded-t-md transition-colors">
+                      <TableHead className="text-white pl-3">Tipo</TableHead>
+                      <TableHead className="text-white">Duración</TableHead>
+                      <TableHead className="text-white">Notas</TableHead>
+                      <TableHead className="text-white">Fecha</TableHead>
+                      <TableHead className="text-right text-white pr-3">
+                        Acciones
+                      </TableHead>
+                    </TableRow>
+                  </TableHeader>
                   <TableBody>
                     {dailyActivities.map((da) => (
                       <TableRow key={da.id}>

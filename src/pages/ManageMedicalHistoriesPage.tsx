@@ -201,6 +201,7 @@ export default function ManageMedicalHistoriesPage() {
           });
         }
       }
+      fetchMedicalHistories();
       setIsOpen(false);
     } catch (error) {
       toast.error("Error al guardar el historial médico.");

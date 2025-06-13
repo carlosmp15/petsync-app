@@ -81,7 +81,7 @@ export default function ManageFeedingsPage() {
   const [selectedToDelete, setSelectedToDelete] = useState<number | null>(null);
   const { id, name } = useSelectedPetStore();
 
-  const fetchMedicalHistories = async () => {
+  const fetchFeedings = async () => {
     try {
       const result = await getAllFeedingsByPetId(id);
 
@@ -96,12 +96,12 @@ export default function ManageFeedingsPage() {
   };
 
   useEffect(() => {
-    fetchMedicalHistories();
+    fetchFeedings();
   }, []);
 
   useEffect(() => {
     if (id !== undefined) {
-      fetchMedicalHistories();
+      fetchFeedings();
     }
   }, [id]);
 
@@ -211,6 +211,7 @@ export default function ManageFeedingsPage() {
           });
         }
       }
+      fetchFeedings();
       setIsOpen(false);
     } catch (error) {
       toast.error("Error al guardar el historial alimentario.");
