@@ -146,7 +146,9 @@ export function PetFormDialog({
         <form onSubmit={handleSubmit(onInternalSubmit)} className="grid gap-4 py-1">
           {/* Nombre */}
           <div className="flex flex-col gap-1">
-            <Label htmlFor="name">Nombre</Label>
+            <Label htmlFor="name">
+              Nombre <span className="text-red-500 font-bold">*</span>
+            </Label>
             <Input
               id="name"
               placeholder="Nombre de la mascota"
@@ -161,7 +163,9 @@ export function PetFormDialog({
 
           {/* Raza */}
           <div className="flex flex-col gap-1">
-            <Label htmlFor="breed">Raza</Label>
+            <Label htmlFor="breed">
+              Raza <span className="text-red-500 font-bold">*</span>
+            </Label>
             <ComboBox
               items={breeds}
               value={getValues("breed")}
@@ -178,7 +182,9 @@ export function PetFormDialog({
 
           {/* Género */}
           <div className="flex flex-col gap-1">
-            <Label htmlFor="gender">Género</Label>
+            <Label htmlFor="gender">
+              Género <span className="text-red-500 font-bold">*</span>
+            </Label>
             <Controller
               control={control}
               name="gender"
@@ -204,7 +210,9 @@ export function PetFormDialog({
 
           {/* Peso */}
           <div className="flex flex-col gap-1">
-            <Label htmlFor="weight">Peso (kg)</Label>
+            <Label htmlFor="weight">
+              Peso (kg) <span className="text-red-500 font-bold">*</span>
+            </Label>
             <Input
               type="number"
               id="weight"
@@ -227,7 +235,9 @@ export function PetFormDialog({
 
           {/* Fecha de nacimiento */}
            <div className="flex flex-col gap-1">
-            <Label htmlFor="birthday">Fecha de nacimiento</Label>
+            <Label htmlFor="birthday">
+              Fecha de nacimiento <span className="text-red-500 font-bold">*</span>
+            </Label>
             <Controller
               control={control}
               name="birthday"

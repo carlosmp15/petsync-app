@@ -182,7 +182,10 @@ export default function SettingsPage() {
           <Card className="pt-3">
             <CardContent className="space-y-6">
               <div className="space-y-2">
-                <Label htmlFor="name">Nombre</Label>
+                <Label htmlFor="name">
+                  Nombre <span className="text-red-500 font-bold">*</span>
+                </Label>
+
                 <Input
                   id="name"
                   name="name"
@@ -193,7 +196,9 @@ export default function SettingsPage() {
                 />
               </div>
               <div className="space-y-2">
-                <Label htmlFor="surname">Apellidos</Label>
+                <Label htmlFor="surname">
+                  Apellidos <span className="text-red-500 font-bold">*</span>
+                </Label>
                 <Input
                   id="surname"
                   name="surname"
@@ -204,7 +209,9 @@ export default function SettingsPage() {
                 />
               </div>
               <div className="space-y-2">
-                <Label htmlFor="email">Email</Label>
+                <Label htmlFor="email">
+                  Email <span className="text-red-500 font-bold">*</span>
+                </Label>
                 <Input
                   id="email"
                   name="email"
@@ -215,7 +222,9 @@ export default function SettingsPage() {
                 />
               </div>
               <div className="space-y-2">
-                <Label htmlFor="phone-number">Número de teléfono</Label>
+                <Label htmlFor="phone-number">
+                  Número de teléfono <span className="text-red-500 font-bold">*</span>
+                </Label>
                 <PhoneInput
                   id="phone-number"
                   name="phone-number"
@@ -226,8 +235,12 @@ export default function SettingsPage() {
                 />
               </div>
               <div className="space-y-2 flex flex-col">
-                <Label htmlFor="birthday">Fecha de nacimiento</Label>
-                <DatePicker selected={userData?.birthday} onChange={setBirthday}/>
+                <Label htmlFor="birthday">
+                  Fecha de nacimiento <span className="text-red-500 font-bold">*</span>
+                </Label>
+                <DatePicker 
+                  selected={userData?.birthday} 
+                  onChange={setBirthday} />
               </div>
             </CardContent>
           </Card>

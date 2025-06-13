@@ -67,7 +67,9 @@ export default function RegisterPage() {
               <div className="grid gap-6">
                 {/* Nombre */}
                 <div className="grid gap-2">
-                  <Label htmlFor="name">Nombre</Label>
+                  <Label htmlFor="name">
+                    Nombre <span className="text-red-500 font-bold">*</span>
+                  </Label>
                   <Controller
                     name="name"
                     control={control}
@@ -83,7 +85,9 @@ export default function RegisterPage() {
 
                 {/* Apellidos */}
                 <div className="grid gap-2">
-                  <Label htmlFor="surname">Apellidos</Label>
+                  <Label htmlFor="surname">
+                    Apellidos <span className="text-red-500 font-bold">*</span>
+                  </Label>
                   <Controller
                     name="surname"
                     control={control}
@@ -99,7 +103,9 @@ export default function RegisterPage() {
 
                 {/* Email */}
                 <div className="grid gap-2">
-                  <Label htmlFor="email">Email</Label>
+                  <Label htmlFor="email">
+                    Email <span className="text-red-500 font-bold">*</span>
+                  </Label>
                   <Controller
                     name="email"
                     control={control}
@@ -118,7 +124,9 @@ export default function RegisterPage() {
 
                 {/* Teléfono */}
                 <div className="grid gap-2">
-                  <Label htmlFor="phone-number">Número de teléfono</Label>
+                  <Label htmlFor="phone-number">
+                    Número de teléfono <span className="text-red-500 font-bold">*</span>
+                  </Label>
                   <Controller
                     name="phone"
                     control={control}
@@ -142,7 +150,9 @@ export default function RegisterPage() {
 
                 {/* Contraseña */}
                 <div className="grid gap-2">
-                  <Label htmlFor="password">Contraseña</Label>
+                  <Label htmlFor="password">
+                    Contraseña <span className="text-red-500 font-bold">*</span>
+                  </Label>
                   <Controller
                     name="password"
                     control={control}
@@ -161,7 +171,9 @@ export default function RegisterPage() {
 
                 {/* Fecha de nacimiento */}
                 <div className="grid gap-2">
-                  <Label htmlFor="birthday">Fecha de nacimiento</Label>
+                  <Label htmlFor="birthday">
+                    Fecha de nacimiento <span className="text-red-500 font-bold">*</span>
+                  </Label>
                   <Controller
                     name="birthday"
                     control={control}

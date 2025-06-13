@@ -245,7 +245,9 @@ export default function ManageDailyActivitiesPage() {
                   className="grid gap-4 py-4"
                 >
                   <div className="grid gap-2">
-                    <Label htmlFor="type">Tipo</Label>
+                    <Label htmlFor="type">
+                      Tipo <span className="text-red-500 font-bold">*</span>
+                    </Label>
                     <Controller
                       control={control}
                       name="type"
@@ -280,7 +282,9 @@ export default function ManageDailyActivitiesPage() {
                   </div>
 
                   <div className="grid gap-2">
-                    <Label htmlFor="duration">Duración (min)</Label>
+                    <Label htmlFor="duration">
+                      Duración (min) <span className="text-red-500 font-bold">*</span>
+                    </Label>
                     <Controller
                       control={control}
                       name="duration"
@@ -320,7 +324,9 @@ export default function ManageDailyActivitiesPage() {
                   </div>
 
                   <div className="grid gap-2">
-                    <Label htmlFor="notes">Notas</Label>
+                    <Label htmlFor="notes">
+                      Notas <span className="text-red-500 font-bold">*</span>
+                    </Label>
                     <Controller
                       control={control}
                       name="notes"
@@ -348,7 +354,9 @@ export default function ManageDailyActivitiesPage() {
                   </div>
 
                   <div className="grid gap-2">
-                    <Label htmlFor="date">Fecha</Label>
+                    <Label htmlFor="date">
+                      Fecha <span className="text-red-500 font-bold">*</span>
+                    </Label>
                     <Controller
                       control={control}
                       name="date"

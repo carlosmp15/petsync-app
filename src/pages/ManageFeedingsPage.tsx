@@ -256,7 +256,9 @@ export default function ManageFeedingsPage() {
                   className="grid gap-4 py-4"
                 >
                   <div className="grid gap-2">
-                    <Label htmlFor="type">Tipo</Label>
+                    <Label htmlFor="type">
+                      Tipo <span className="text-red-500 font-bold">*</span>
+                    </Label>
                     <Controller
                       control={control}
                       name="type"
@@ -293,7 +295,9 @@ export default function ManageFeedingsPage() {
                   </div>
 
                   <div className="grid gap-2">
-                    <Label htmlFor="description">Descripción</Label>
+                    <Label htmlFor="description">
+                      Descripción <span className="text-red-500 font-bold">*</span>
+                    </Label>
                     <Controller
                       control={control}
                       name="description"
@@ -327,7 +331,9 @@ export default function ManageFeedingsPage() {
                   </div>
 
                   <div className="grid gap-2">
-                    <Label htmlFor="quantity">Cantidad {"(gramos)"}</Label>
+                    <Label htmlFor="quantity">
+                      Cantidad {"(gramos)"} <span className="text-red-500 font-bold">*</span>
+                    </Label>
                     <Controller
                       control={control}
                       name="quantity"
@@ -362,7 +368,9 @@ export default function ManageFeedingsPage() {
                   </div>
 
                   <div className="grid gap-2">
-                    <Label htmlFor="date">Fecha</Label>
+                    <Label htmlFor="date">
+                      Fecha <span className="text-red-500 font-bold">*</span>
+                    </Label>
                     <Controller
                       control={control}
                       name="date"

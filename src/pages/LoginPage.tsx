@@ -75,7 +75,9 @@ export default function LoginPage() {
               </div>
               <div className="grid gap-6">
                 <div className="grid gap-2">
-                  <Label htmlFor="email">Email</Label>
+                  <Label htmlFor="email">
+                    Email <span className="text-red-500 font-bold">*</span>
+                  </Label>
                   <Controller
                     name="email"
                     control={control}
@@ -95,7 +97,9 @@ export default function LoginPage() {
                   />
                 </div>
                 <div className="grid gap-2">
-                  <Label htmlFor="password">Contraseña</Label>
+                  <Label htmlFor="password">
+                    Contraseña <span className="text-red-500 font-bold">*</span>
+                  </Label>
                   <Controller
                     name="password"
                     control={control}
