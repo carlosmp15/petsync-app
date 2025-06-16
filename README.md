@@ -1,54 +1,53 @@
-# React + TypeScript + Vite
+# 🐾 PetSync
 
-This template provides a minimal setup to get React working in Vite with HMR and some ESLint rules.
+**PetSync** es una plataforma web desarrollada con React para la gestión integral de mascotas. Permite a los usuarios registrar, visualizar y gestionar historiales médicos, alimentación y actividades diarias de sus mascotas, con un diseño moderno, intuitivo y responsive.
 
-Currently, two official plugins are available:
 
-- [@vitejs/plugin-react](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react) uses [Babel](https://babeljs.io/) for Fast Refresh
-- [@vitejs/plugin-react-swc](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react-swc) uses [SWC](https://swc.rs/) for Fast Refresh
+## 🌐 Demo en vivo
 
-## Expanding the ESLint configuration
+👉 [https://carlosm.cicloflorenciopintado.es](https://carlosm.cicloflorenciopintado.es)
 
-If you are developing a production application, we recommend updating the configuration to enable type-aware lint rules:
 
-```js
-export default tseslint.config({
-  extends: [
-    // Remove ...tseslint.configs.recommended and replace with this
-    ...tseslint.configs.recommendedTypeChecked,
-    // Alternatively, use this for stricter rules
-    ...tseslint.configs.strictTypeChecked,
-    // Optionally, add this for stylistic rules
-    ...tseslint.configs.stylisticTypeChecked,
-  ],
-  languageOptions: {
-    // other options...
-    parserOptions: {
-      project: ['./tsconfig.node.json', './tsconfig.app.json'],
-      tsconfigRootDir: import.meta.dirname,
-    },
-  },
-})
-```
+## 📌 Funcionalidades principales
 
-You can also install [eslint-plugin-react-x](https://github.com/Rel1cx/eslint-react/tree/main/packages/plugins/eslint-plugin-react-x) and [eslint-plugin-react-dom](https://github.com/Rel1cx/eslint-react/tree/main/packages/plugins/eslint-plugin-react-dom) for React-specific lint rules:
+- Registro de múltiples mascotas por usuario
+- Gestión de:
+  - Alimentación (historial y seguimiento)
+  - Actividades diarias (ejercicio, juegos, etc.)
+  - Historiales médicos (vacunas, consultas, etc.)
+- Sistema de autenticación seguro
+- Filtros avanzados por nombre, sexo, peso
+- Panel de usuario para modificar información
+- Responsive: accesible desde móvil, tablet y PC
+- Recordatorio para eventos (futuro)
+- Comunidad de usuarios (propuesta futura)
 
-```js
-// eslint.config.js
-import reactX from 'eslint-plugin-react-x'
-import reactDom from 'eslint-plugin-react-dom'
+## 🛠️ Tecnologías utilizadas
 
-export default tseslint.config({
-  plugins: {
-    // Add the react-x and react-dom plugins
-    'react-x': reactX,
-    'react-dom': reactDom,
-  },
-  rules: {
-    // other rules...
-    // Enable its recommended typescript rules
-    ...reactX.configs['recommended-typescript'].rules,
-    ...reactDom.configs.recommended.rules,
-  },
-})
-```
+| Categoría   | Tecnologías |
+|-------------|-------------|
+| Frontend    | React, TailwindCSS, Zustand, Lucide, Shadcn, React Hook Form |
+| Backend     | Laravel (inicialmente Express.js) |
+| Base de datos | MySQL (hosting con phpMyAdmin) |
+| Herramientas | Postman, GitHub, Swagger, Composer, VSCode |
+
+## ⚙️ Instalación local
+
+### 🔧 Requisitos
+
+- Node.js
+- Composer
+- MySQL o servidor con phpMyAdmin
+
+### 🧩 Pasos
+
+```bash
+# Clonar el repositorio
+git clone https://github.com/carlosmp15/petsync-app.git
+
+# Entrar al frontend y arrancar
+cd petsync-app
+npm install
+npm run dev
+
+
