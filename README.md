@@ -27,7 +27,6 @@
 | Categoría   | Tecnologías |
 |-------------|-------------|
 | Frontend    | React, TailwindCSS, Zustand, Lucide, Shadcn, React Hook Form |
-| Backend     | Laravel (inicialmente Express.js) |
 | Base de datos | MySQL (hosting con phpMyAdmin) |
 | Herramientas | Postman, GitHub, Swagger, Composer, VSCode |
 
@@ -36,8 +35,6 @@
 ### 🔧 Requisitos
 
 - Node.js
-- Composer
-- MySQL o servidor con phpMyAdmin
 
 ### 🧩 Pasos
 
