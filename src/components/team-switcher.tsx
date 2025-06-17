@@ -15,7 +15,6 @@ import { createNewPet } from "@/services/PetService"
 import { useSelectedPetStore } from "@/stores/selectedPetStore"
 import { toast } from "react-toastify"
 import { format } from "date-fns"
-import { useNavigate } from "react-router-dom"
 import { PetFormDialog } from "./PetFormDialog"
 import { getUserDataFromLocalStorage } from "@/utils"
 
@@ -33,7 +32,6 @@ export function TeamSwitcher({
 
   const { id, setSelectedPet, resetSelectedPet } = useSelectedPetStore()
   const userData = getUserDataFromLocalStorage()
-  const navigate = useNavigate()
 
   useEffect(() => {
     if (teams.length > 0) {

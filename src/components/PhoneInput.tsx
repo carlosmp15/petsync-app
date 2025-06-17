@@ -85,7 +85,7 @@ const CountrySelect = ({ disabled, value: selectedCountry, options: countryList,
       </PopoverTrigger>
       <PopoverContent className="w-[300px] p-0">
         <Command>
-          <CommandInput placeholder="Search country..." />
+          <CommandInput placeholder="Buscar país..." />
           <CommandList>
             <ScrollArea className="h-72">
               <CommandEmpty>No country found.</CommandEmpty>

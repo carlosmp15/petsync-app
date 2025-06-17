@@ -424,7 +424,7 @@ export default function ManageFeedingsPage() {
                       <TableRow key={ms.id}>
                         <TableCell className="font-medium">{ms.type}</TableCell>
                         <TableCell>{ms.description}</TableCell>
-                        <TableCell>{ms.quantity}</TableCell>
+                        <TableCell>{ms.quantity} g</TableCell>
                         <TableCell>
                           {format(ms.date, "dd/MM/yyyy", { locale: es })}
                         </TableCell>
